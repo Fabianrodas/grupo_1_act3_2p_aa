@@ -1,7 +1,7 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
-from consts import *
+from .consts import *
 import textwrap
 
 SEMESTRES = {
