@@ -1,7 +1,7 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
-from consts import *
+from utils.consts import *
 import textwrap
 
 def getMalla():
@@ -61,5 +61,3 @@ def dibujarMalla(G):
     ax.set_axis_off()
     plt.tight_layout()
     plt.show()
-    
-dibujarMalla(getMalla())
