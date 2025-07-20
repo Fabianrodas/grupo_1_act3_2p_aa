@@ -8,45 +8,45 @@ def getMalla():
     materias = [
         # Año 1
         # Primer Semestre
-        "Matemáticas I", "Física I", "Álgebra Lineal", "Computación y Sociedad", "Ética",
+        MATEMATICAS_I, FISICA_I, ALGEBRA_LINEAL, COMPUTACION_SOCIEDAD, ETICA,
         # Segundo Semestre
-        "Matemáticas II", "Física II", "Probabilidad y Estadística", "Matemáticas Discretas", "Tecnologías Disruptivas",
+        MATEMATICAS_II, FISICA_II, PROBABILIDAD_ESTADISTICA, MATEMATICAS_DISCRETAS, TECNOLOGIAS_DISRUPTIVAS,
         # Año 2
         # Tercer Semestre
-        "Matemáticas III", "Lógica Digital", "Base de Datos I", "Fundamentos de Programación", "Desarrollo Humano",
+        MATEMATICAS_III, LOGICA_DIGITAL, BASE_DATOS_I, FUNDAMENTOS_PROGRAMACION, DESARROLLO_HUMANO,
         # Cuarto Semestre
-        "Organización y Arquitectura de Computadores", "Redes y Comunicaciones", "Base de Datos II", "Programación Orientada a Objetos", "Comunicación e Imagen Profesional",
+        OAC, REDES_COMUNICACIONES, BASE_DATOS_II, POO, COMUNICACION_PROFESIONAL,
         # Año 3
         # Quinto Semestre
-        "Sistemas Operativos", "Diseño de Software", "Lenguajes de Programación", "Estructura de Datos", "Desarrollo Sostenible",
+        SISTEMAS_OPERATIVOS, DDS, POO, ESTRUCTURA_DATOS, DESARROLLO_HUMANO,
         # Sexto Semestre
-        "Sistemas Distribuidos", "Interacción Hombre-Máquina", "Desarrollo de Aplicaciones Web", "Análisis de Algoritmos", "Liderazgo, Emprendimiento e Innovación",
+        SISTEMAS_DISTRIBUIDAS, INTERACCION_HM, DESARROLLO_WEB, ANALISIS_ALGORITMOS, LIDERAZGO_EMPRENDIMIENTO,
         # Año 4
         # Septimo Semestre
-        "Procesamiento Masivo de Datos", "Ingeniería de Software I", "Sistemas Inteligentes", "Prácticas de Servicio Comunitario", "Proyecto de Titulación I"
+        PROCESAMIENTO_DATOS, INGENIERIA_SOFTWARE_I, SISTEMAS_INTELIGENTES, PRACTICAS_COMUNITARIAS, TITULACION_I
         # Octavo Semestre
-        "Ethical Hacking", "Ingeniería de Software II", "Fundamentos de Computación Forense", "Prácticas Laborales", "Proyecto de Titulación II"
+        ETHICAL_HACKING, INGENIERIA_SOFTWARE_II, FUNDAMENTOS_FORENSES, PRACTICAS_LABORALES, TITULACION_II
     ]
 
     malla.add_nodes_from(materias)
     
     relaciones = [
         # Primer Semestre
-        ("Matemáticas I", "Matemáticas II"), ("Física I", "Física II"), ("Álgebra Lineal", "Probabilidad y Estadística"), ("Computación y Sociedad", "Matemáticas Discretas"),
+        (MATEMATICAS_I, MATEMATICAS_II), (FISICA_I, FISICA_II), (ALGEBRA_LINEAL, PROBABILIDAD_ESTADISTICA), (COMPUTACION_SOCIEDAD, MATEMATICAS_DISCRETAS),
         # Segundo Semestre
-        ("Matemáticas II", "Matemáticas III"), ("Física II", "Lógica Digital"), ("Probabilidad y Estadística", "Lógica Digital"), ("Matemáticas Discretas", "Fundamentos de Programación"), ("Tecnologías Disruptivas", "Base de Datos I"), ("Tecnologías Disruptivas", "Fundamentos de Programación"),
+        (MATEMATICAS_II, MATEMATICAS_III), (FISICA_II, LOGICA_DIGITAL), (PROBABILIDAD_ESTADISTICA, LOGICA_DIGITAL), (MATEMATICAS_DISCRETAS, FUNDAMENTOS_PROGRAMACION), (TECNOLOGIAS_DISRUPTIVAS, BASE_DATOS_I), (TECNOLOGIAS_DISRUPTIVAS, FUNDAMENTOS_PROGRAMACION),
         # Tercer Semestre
-        ("Matemáticas III", "Redes y Comunicaciones"), ("Lógica Digital", "Organización y Arquitectura de Computadoras"), ("Lógica Digital", "Redes y Comunicaciones"), ("Base de Datos I", "Base de Datos II"), ("Fundamentos de Programación", "Base de Datos I"), ("Fundamentos de Programación", "Programación Orientada a Objetos"),
+        (MATEMATICAS_III, REDES_COMUNICACIONES), (LOGICA_DIGITAL, OAC), (LOGICA_DIGITAL, REDES_COMUNICACIONES), (BASE_DATOS_I, BASE_DATOS_II), (FUNDAMENTOS_PROGRAMACION, BASE_DATOS_I), (FUNDAMENTOS_PROGRAMACION, POO),
         # Cuarto Semestre
-        ("Organización y Arquitectura de Computadores", "Sistemas Operativos"), ("Redes y Comunicaciones", "Sistemas Operativos"), ("Base de Datos II", "Desarrollo de Aplicaciones Web"), ("Programación Orientada a Objetos", "Sistemas Operativos"), ("Programación Orientada a Objetos", "Diseño de Software"), ("Programación Orientada a Objetos", "Lenguajes de Programación"), ("Programación Orientada a Objetos", "Estructura de Datos"), 
+        (OAC, SISTEMAS_OPERATIVOS), (REDES_COMUNICACIONES, SISTEMAS_OPERATIVOS), (BASE_DATOS_II, DESARROLLO_WEB), (POO, SISTEMAS_OPERATIVOS), (POO, DDS), (POO, LENGUAJES_PROGRAMACION), (POO, ESTRUCTURA_DATOS), 
         # Quinto Semestre
-        ("Sistemas Operativos", "Sistemas Distribuidos"), ("Diseño de Software", "Desarrollo de Aplicaciones Web"), ("Lenguajes de Programación", "Diseño de Software"), ("Lenguajes de Programación", "Desarrollo de Aplicaciones Web"), ("Estructura de Datos", "Lenguajes de Programación"), ("Estructura de Datos", "Análisis de Algoritmos"),
+        (SISTEMAS_OPERATIVOS, SISTEMAS_DISTRIBUIDAS), (DDS, DESARROLLO_WEB), (LENGUAJES_PROGRAMACION, DDS), (LENGUAJES_PROGRAMACION, DESARROLLO_WEB), (ESTRUCTURA_DATOS, LENGUAJES_PROGRAMACION), (ESTRUCTURA_DATOS, ANALISIS_ALGORITMOS),
         # Sexto Semestre
-        ("Sistemas Distribuidos", "Procesamiento Masivo de Datos"), ("Sistemas Distribuidos", "Sistemas Inteligentes"), ("Interacción Hombre Máquina", "Ingeniería de Software I"), ("Desarrollo de Aplicaciones Web", "Interacción Hombre Máquina"), ("Desarrollo de Aplicaciones Web", "Sistemas Inteligentes"), ("Análisis de Algoritmos", "Sistemas Inteligentes"),
+        (SISTEMAS_DISTRIBUIDAS, PROCESAMIENTO_DATOS), (SISTEMAS_DISTRIBUIDAS, SISTEMAS_INTELIGENTES), (INTERACCION_HM, INGENIERIA_SOFTWARE_I), (DESARROLLO_WEB, INTERACCION_HM), (DESARROLLO_WEB, SISTEMAS_INTELIGENTES), (ANALISIS_ALGORITMOS, SISTEMAS_INTELIGENTES),
         # Séptimo Semestre
-        ("Procesamiento Masivo de Datos", "Ethical Hacking"), ("Procesamiento Masivo de Datos", "Proyecto de Titulación I"), ("Procesamiento Masivo de Datos", "Proyecto de Titulación II"), ("Ingeniería de Software I", "Ingeniería de Software II"), ("Sistemas Inteligentes", "Fundamentos de Computación Forense"), ("Sistemas Inteligentes", "Proyecto de Titulación I"), ("Sistemas Inteligentes", "Proyecto de Titulación II"), ("Proyecto de Titulación I", "Proyecto de Titulación II"),
+        (PROCESAMIENTO_DATOS, ETHICAL_HACKING), (PROCESAMIENTO_DATOS, TITULACION_I), (PROCESAMIENTO_DATOS, TITULACION_II), (INGENIERIA_SOFTWARE_I, INGENIERIA_SOFTWARE_II), (SISTEMAS_INTELIGENTES, FUNDAMENTOS_FORENSES), (SISTEMAS_INTELIGENTES, TITULACION_I), (SISTEMAS_INTELIGENTES, TITULACION_II), (TITULACION_I, TITULACION_II),
         # Octavo Semestre
-        ("Ethical Hacking", "Proyecto de Titulación I"), ("Ethical Hacking", "Proyecto de Titulación II"), ("Ingeniería de Software II", "Proyecto de Titulación I"), ("Ingeniería de Software II", "Proyecto de Titulación II"), ("Fundamentos de Computación Forense", "Proyecto de Titulación I"), ("Fundamentos de Computación Forense", "Proyecto de Titulación II")
+        (ETHICAL_HACKING, TITULACION_I), (ETHICAL_HACKING, TITULACION_II), (INGENIERIA_SOFTWARE_II, TITULACION_I), (INGENIERIA_SOFTWARE_II, TITULACION_II), (FUNDAMENTOS_FORENSES, TITULACION_I), (FUNDAMENTOS_FORENSES, TITULACION_II)
     ]
 
     malla.add_edges_from(relaciones)
