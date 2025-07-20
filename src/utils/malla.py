@@ -1,5 +1,6 @@
 import networkx as nx
 import matplotlib.pyplot as plt
+import src.utils.consts
 
 def getMalla():
     malla = nx.DiGraph()
