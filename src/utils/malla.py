@@ -1,6 +1,8 @@
 import networkx as nx
 import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 from consts import *
+import textwrap
 
 SEMESTRES = {
     1: [MATEMATICAS_I, FISICA_I, ALGEBRA_LINEAL, COMPUTACION_SOCIEDAD, ETICA],
@@ -40,18 +42,52 @@ def getMalla():
     
     return malla
 
+def wrap_label(text, width=20):
+    return "\n".join(textwrap.wrap(text, width=width))
+
 def dibujarMalla(G):
     pos = {}
+    columnas = max(len(materias) for materias in SEMESTRES.values())
+    espacio_x = 4.5
+    espacio_y = 2.5
     for nivel, materias in SEMESTRES.items():
+        offset = (columnas - len(materias)) / 2
         for i, materia in enumerate(materias):
-            pos[materia] = (i, -nivel) 
-    plt.figure(figsize=(20, 14))
-    nx.draw(
-        G, pos, with_labels=True, arrows=True, node_size=2500,
-        node_color="skyblue", font_size=9, font_weight='bold', edge_color="gray"
+            pos[materia] = ((i + offset) * espacio_x, -nivel * espacio_y)
+    labels_envueltos = {nodo: wrap_label(nodo, width=20) for nodo in G.nodes}
+
+    # TAMAÑO DE LA FIGURA
+    fig, ax = plt.subplots(figsize=(11, 7))
+    try:
+        manager = plt.get_current_fig_manager()
+        manager.window.setFixedSize(1300, 900)
+    except:
+        pass
+
+    # RELACIONES (LINEAS ENTRE NODOS)
+    nx.draw_networkx_edges(
+        G, pos, arrows=True, arrowstyle='-', connectionstyle='arc3,rad=0.0',
+        width=1, edge_color="black", ax=ax
     )
-    plt.title("Malla Curricular por Semestres", fontsize=16)
-    plt.axis('off')
+
+    # RECTANGULOS DE MATERIAS
+    for node, (x, y) in pos.items():
+        rect = patches.FancyBboxPatch(
+            (x - 1.25, y - 0.6), 2.5, 1.2,
+            boxstyle="round,pad=0.02",
+            linewidth=1, edgecolor="black", facecolor="skyblue", zorder=1
+        )
+        ax.add_patch(rect)
+
+    # ETIQUETAS DE MATERIAS
+    for node, (x, y) in pos.items():
+        ax.text(
+            x, y, labels_envueltos[node],
+            ha="center", va="center", fontsize=7, weight="bold", zorder=2
+        )
+
+    ax.set_title("Malla Ing. Computación", fontsize=15)
+    ax.set_axis_off()
     plt.tight_layout()
     plt.show()
     
