@@ -1,17 +1,55 @@
 import tkinter as tk
 from tkinter import messagebox
 from PIL import Image, ImageTk
+from perfil import abrirVentanaPerfil
 
 def login():
     usuario = entry_usuario.get()
     contraseña = entry_contraseña.get()
+    if usuario in usuariosValidos and usuariosValidos[usuario]["contraseña"] == contraseña:
+        ventana.withdraw()  # Oculta ventana login
+        usuarioInfo = usuariosValidos[usuario].copy()
+        usuarioInfo["usuario"] = usuario
+        abrirVentanaPerfil(usuarioInfo, ventana)
+    else:
+        messagebox.showerror("Error", "Usuario o contraseña incorrectos")
 
-# Estas líneas solo las puse para testeo, se cambiarán cuando se cree la otra ventana 
-    # if usuario == "paula.benalcazar" and contraseña == "1234":
-    #    messagebox.showinfo("Login Exitoso", f"Bienvenida, {usuario}")
-    # else:
-    #    messagebox.showerror("Error", "Usuario o contraseña incorrectos")
-
+    
+# Lista de usuarios del Portal:
+usuariosValidos = {
+    "paula.benalcazar": {
+        "contraseña": "paulabenalcazar",
+        "nombre": "PAULA MYLENNE BENALCÁZAR TORRES",
+        "carrera": "INGENIERÍA EN CIENCIAS DE LA COMPUTACIÓN",
+        "matricula": "2023240010",
+        "cedula": "0901234567",
+        "gpa": 91
+    },
+    "fabian.rodas": {
+        "contraseña": "fabianrodas",
+        "nombre": "FABIÁN EMMANUEL RODAS HIDALGO",
+        "carrera": "INGENIERÍA EN CIENCIAS DE LA COMPUTACIÓN",
+        "matricula": "2023240011",
+        "cedula": "0904568766",
+        "gpa": 89
+    },
+    "dylan.drouet": {
+        "contraseña": "dylandrouet",
+        "nombre": "DYLAN GABRIEL DROUET URETA",
+        "carrera": "INGENIERÍA EN CIENCIAS DE LA COMPUTACIÓN",
+        "matricula": "2023240012",
+        "cedula": "0908765432",
+        "gpa": 88
+    },
+    "luis.goncalves": {
+        "contraseña": "luisgoncalves",
+        "nombre": "LUIS FERNANDO GONCALVES LÓPEZ",
+        "carrera": "INGENIERÍA EN CIENCIAS DE LA COMPUTACIÓN",
+        "matricula": "2023240013",
+        "cedula": "0902345678",
+        "gpa": 90
+    }
+}
 
 ventana = tk.Tk()
 ventana.title("Portal de Servicios UEES")
