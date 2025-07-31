@@ -41,6 +41,211 @@ PRACTICAS_LABORALES = "Prácticas Laborales"
 FUNDAMENTOS_FORENSES = "Fundamentos de Computación Forense"
 ETHICAL_HACKING = "Ethical Hacking"
 
+# Información adicional de las materias
+Materias_Info = {
+    "Matemáticas I" : {
+        "codigo": "UMAT102",
+        "profesor": "BRAVO MORENO JONNATHAN ISAAC",
+        "horario": "Martes,Jueves 08:50-10:20"
+    },
+    "Matemáticas II" : {
+        "codigo": "UMAT192",
+        "profesor": "FLORES MARIN MONICA JEANNETTE",
+        "horario": "Lunes,Miércoles 10:30-12:00"
+    },
+    "Matemáticas III" : {
+        "codigo": "UMAT202",
+        "profesor": "BENAVIDES CASTILLO LUIS ENRIQUE",
+        "horario": "Martes,Jueves 11:30-13:30"
+    },
+    "Física I" : {
+        "codigo": "UFIS105",
+        "profesor": "BRAVO MORENO JONNATHAN ISAAC",
+        "horario": "Lunes,Miércoles 10:30-12:00"
+    },
+    "Física II" : {
+        "codigo": "UFIS150",
+        "profesor": "LAMILLA RUBIO ERICK ABRAHAM",
+        "horario": "Lunes,Miércoles 10:30-12:00"
+    },
+    "Algebra Lineal" : {
+        "codigo": "UMAT205",
+        "profesor": "BRAVO MORENO JONNATHAN ISAAC",
+        "horario": "Lunes,Miércoles 07:10-09:10"
+    },
+    "Computación y Sociedad" : {
+        "codigo": "UCOM180",
+        "profesor": "ALBAN LOPEZ FAUSTO ARTURO",
+        "horario": "Martes,Jueves 11:30-13:30"
+    },
+    "Ética" : {
+        "codigo": "UFORU1103",
+        "profesor": "GONZALEZ VIZUETE KARLA FERNANDA",
+        "horario": "Martes,Jueves 16:15-17:45"
+    },
+    "Probabilidad y Estadísticas" : {
+        "codigo": "UMAT251",
+        "profesor": "MONTAÑO PULZARA NESTOR RAFAEL",
+        "horario": "Martes,Jueves 12:15-13:45"
+    },
+    "Matemáticas Discretas" : {
+        "codigo": "UMAT191",
+        "profesor": "BRAVO MORENO JONNATHAN ISAAC",
+        "horario": "Lunes,Miércoles 08:50-10:20"
+    },
+    "Tecnologías Disruptivas" : {
+        "codigo": "UFORU1203",
+        "profesor": "SOTOMAYOR SANCHEZ MARCO VINICIO",
+        "horario": "Martes,Jueves 16:15-17:45"
+    },
+    "Lógica Digital" : {
+        "codigo": "UELE0250",
+        "profesor": "VASQUEZ CEVALLOS LEONEL ADALBERTO",
+        "horario": "Martes,Jueves 10:30-12:00"
+    },
+    "Base de Datos I" : {
+        "codigo": "UCOM204",
+        "profesor": "COQUE VILLEGAS SHIRLEY GUISELLA",
+        "horario": "Martes,Jueves 14:30-16:00"
+    },
+    "Base de Datos II" : {
+        "codigo": "UCOM253",
+        "profesor": "COQUE VILLEGAS SHIRLEY GUISELLA",
+        "horario": "Martes,Jueves 12:15-13:45"
+    },
+    "Fundamentos de Programación" : {
+        "codigo": "UCOM311",
+        "profesor": "LEON GRANIZO OSCAR DARIO",
+        "horario": "Lunes,Miércoles 12:15-13:45"
+    },
+    "Desarrollo Humano" : {
+        "codigo": "UFORU1152",
+        "profesor": "OBANDO ZAMBRANO BOLIVAR",
+        "horario": "Martes,Jueves 16:10-18:10"
+    },
+    "Organización y Arquitectura de Computadores" : {
+        "codigo": "UCOM250",
+        "profesor": "PAILLACHO CHILUIZA DENNYS FABIAN",
+        "horario": "Martes,Jueves 09:15-11:15"
+    },
+    "Redes y Comunicaciones" : {
+        "codigo": "UTEL360",
+        "profesor": "BENAVIDES CASTILLO LUIS ENRIQUE",
+        "horario": "Lunes,Miércoles 16:15-17:45"
+    },
+    "Programación Orientada a Objetos" : {
+        "codigo": "UCOM252",
+        "profesor": "JURADO VITE VANESSA ALEXANDRA",
+        "horario": "Martes,Jueves 08:45-10:15"
+    },
+    "Comunicación e Imagen Profesional" : {
+        "codigo": "UFORU1104",
+        "profesor": "POVEDA BENITES SYLVIA GISELLA",
+        "horario": "Lunes,Miércoles 16:10-18:10"
+    },
+    "Sistemas Operativos" : {
+        "codigo": "UCOM418",
+        "profesor": "PIZARRO VASQUEZ GUILLERMO OMAR",
+        "horario": "Lunes,Miércoles 07:00-09:00"
+    },
+    "Diseño de Software" : {
+        "codigo": "UCOM0310",
+        "profesor": "MONTOYA FREIRE MARIA LORENA",
+        "horario": "Martes,Jueves 07:00-09:00"
+    },
+    "Lenguajes de Programación" : {
+        "codigo": "UCOM320",
+        "profesor": "JURADO VITE VANESSA ALEXANDRA",
+        "horario": "Martes,Jueves 07:00-08:30"
+    },
+    "Estructura de Datos" : {
+        "codigo": "UCOM203",
+        "profesor": "CRUZ RAMIREZ EDUARDO SEGUNDO",
+        "horario": "Lunes 18:30-20:30; Viernes 16:15-18:15"
+    },
+    "Desarrollo Sostenible" : {
+        "codigo": "UFORU1200",
+        "profesor": "ALMEIDA GARCES VICTOR ANDRES",
+        "horario": "Lunes,Miércoles 16:20-17:50"
+    },
+    "Sistemas Distribuidos" : {
+        "codigo": "UCOM465",
+        "profesor": "PIZARRO VASQUEZ GUILLERMO OMAR",
+        "horario": "Viernes 07:00-10:00"
+    },
+    "Interacción Hombre Máquina" : {
+        "codigo": "UCOM408",
+        "profesor": "MONTOYA FREIRE MARIA LORENA",
+        "horario": "Martes,Jueves 07:00-08:30"
+    },
+    "Desarrollo de Aplicaciones Web" : {
+        "codigo": "UCOM351",
+        "profesor": "JURADO VITE VANESSA ALEXANDRA",
+        "horario": "Martes,Jueves 18:00-19:30"
+    },
+    "Análisis de Algoritmos" : {
+        "codigo": "USIST0300",
+        "profesor": "MONTOYA FREIRE MARIA LORENA",
+        "horario": "Martes,Jueves 08:45-10:15"
+    },
+    "Liderazgo, Emprendimiento e Innovación" : {
+        "codigo": "UFORU1153",
+        "profesor": "RESHUAN LANDIVAR MARIA JOSE",
+        "horario": "Martes,Jueves 14:30-16:00"
+    },
+    "Procesamiento Masivo de Datos" : {
+        "codigo": "UCOM1358",
+        "profesor": "LEON GRANIZO OSCAR DARIO",
+        "horario": "Lunes,Miércoles 18:00-19:00"
+    },
+    "Ingeniería de Software I" : {
+        "codigo": "UCOM304",
+        "profesor": "COQUE VILLEGAS SHIRLEY GUISELLA",
+        "horario": "Martes,Jueves 16:15-17:45"
+    },
+    "Ingeniería de Software II" : {
+        "codigo": "UCOM0500",
+        "profesor": "COQUE VILLEGAS SHIRLEY GUISELLA",
+        "horario": "Martes,Jueves 16:15-17:45"
+    },
+    "Sistemas Inteligentes" : {
+        "codigo": "UCOM1409",
+        "profesor": "BOTTO TOBAR MIGUEL ANGEL",
+        "horario": "Lunes,Miércoles 16:15-17:45"
+    },
+    "Practicas Comunitarias" : {
+        "codigo": "UPRA1352",
+        "profesor": "COQUE VILLEGAS SHIRLEY GUISELLA",
+        "horario": "Viernes 11:30-13:30"
+    },
+    "Proyecto de Titulación I" : {
+        "codigo": "UCOM0400",
+        "profesor": "COQUE VILLEGAS SHIRLEY GUISELLA",
+        "horario": "Lunes,Miércoles 16:15-18:15"
+    },
+    "Proyecto de Titulación II" : {
+        "codigo": "UCOM0451",
+        "profesor": "BENAVIDES CASTILLO LUIS ENRIQUE",
+        "horario": "Lunes,Miércoles 16:15-18:15"
+    },
+    "Prácticas Laborales" : {
+        "codigo": "UPLAB1451",
+        "profesor": "BENAVIDES CASTILLO LUIS ENRIQUE",
+        "horario": "Viernes 14:30-17:30"
+    },
+    "Fundamentos de Computación Forense" : {
+        "codigo": "UCOM550",
+        "profesor": "CRUZ RAMIREZ EDUARDO SEGUNDO",
+        "horario": "Viernes 07:00-10:00"
+    },
+    "Ethical Hacking" : {
+        "codigo": "UCOM425",
+        "profesor": "PACHECO VILLAMAR RUBEN ANTONIO",
+        "horario": "Martes,Jueves 19:35-21:05"
+    },
+}
+
+
 # SEMESTRES Y SUS MATERIAS
 
 SEMESTRES = {
