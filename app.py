@@ -16,6 +16,7 @@ def login():
 ventana = tk.Tk()
 ventana.title("Portal de Servicios UEES")
 ventana.geometry("1000x550")  # Para cambiar el tamaño de la ventana
+ventana.resizable(False, False) 
 ventana.configure(bg="#7b002c")
 
 # Frame izquierdo
@@ -92,17 +93,15 @@ def redimensionar_imagenes(ancho, alto):
     ]
 
 
-label_imagen = tk.Label(frame_derecho, bg="lightgray")
+label_imagen = tk.Label(frame_derecho)
 label_imagen.pack(fill="both", expand=True)
 
-def iniciar_carrusel(event=None):
+def iniciar_carrusel():
     ancho = frame_derecho.winfo_width()
     alto = frame_derecho.winfo_height()
     redimensionar_imagenes(ancho, alto)
     cambiar_imagen()
-frame_derecho.bind("<Configure>", iniciar_carrusel)
-
-index_actual = 0
+ventana.after(100, iniciar_carrusel)
 
 def cambiar_imagen():
     global index_actual
