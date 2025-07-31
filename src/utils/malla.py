@@ -7,11 +7,26 @@ from pathlib import Path
 
 def getMalla():
     malla = nx.DiGraph()
+
     for materias in SEMESTRES.values():
-        malla.add_nodes_from(materias)
+        for materia in materias:
+            atributos = Materias_Info.get(materia, {})
+            malla.add_node(materia, **atributos)
+
     malla.add_edges_from(RELACIONES)
-    
     return malla
+
+def obtener_info_materia(grafo, nombre_materia):
+    if nombre_materia in grafo.nodes:
+        atributos = grafo.nodes[nombre_materia]
+        return {
+            "Materia": nombre_materia,
+            "Código": atributos.get("codigo", "No registrado"),
+            "Profesor": atributos.get("profesor", "No registrado"),
+            "Horario": atributos.get("horario", "No registrado")
+        }
+    else:
+        return {"Error": "Materia no encontrada"}
 
 def wrap_label(text, width=20):
     return "\n".join(textwrap.wrap(text, width=width))
