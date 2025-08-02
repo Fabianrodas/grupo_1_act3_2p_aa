@@ -7,12 +7,12 @@ from utils.malla import getMalla, dibujarMalla, dibujarPrerequisitos, obtener_in
 G = getMalla()
 
 # Probando BFS_prerequisitos
-targetMateria2= "Ingeniería de Software II"
+targetMateria2= "Ingeniería de Software I"
 prerequisitos2 = BFS_prerequisitos(G, targetMateria2)
 
 dibujarMalla(G)
 dibujarPrerequisitos(G, targetMateria2, prerequisitos2)
 
 malla = getMalla()
-info = obtener_info_materia(malla, "Matemáticas I")
+info = obtener_info_materia(malla, "Ingeniería de Software I")
 print(info)
