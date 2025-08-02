@@ -18,7 +18,8 @@ def obtener_imagen_prerequisitos(materia):
 def abrirVentanaPerfil(usuarioInfo, ventana_login):
     perfil_ventana = tk.Toplevel()
     perfil_ventana.title("Perfil del Estudiante")
-    perfil_ventana.geometry("1600x1000")
+    perfil_ventana.state('zoomed')
+    perfil_ventana.resizable(False, False)
     perfil_ventana.configure(bg="white")
 
     # Barra superior
@@ -60,25 +61,27 @@ def abrirVentanaPerfil(usuarioInfo, ventana_login):
     frame.pack(fill="both", expand=True)
 
     # Foto del estudiante
-    canvas = tk.Canvas(frame, width=120, height=120, bg="white", highlightthickness=1, highlightbackground="black")
+    canvas = tk.Canvas(frame, width=140, height=140, bg="white", highlightthickness=1, highlightbackground="black")
     canvas.place(x=50, y=40)
 
-    def insertar_imagen():
-        file_path = filedialog.askopenfilename()
-        if file_path:
-            img = Image.open(file_path)
-            img = img.resize((120, 120))
-            img = ImageTk.PhotoImage(img)
-            canvas.create_image(0, 0, anchor="nw", image=img)
-            canvas.image = img
+    # Ruta de imagen automática según el usuario
+    user_photo_path = Path(__file__).resolve().parents[2] / "images" / f"{usuarioInfo['usuario']}.jpg"
 
-    insertar_btn = tk.Button(frame, text="Insertar imagen\no imagen default", command=insertar_imagen)
-    insertar_btn.place(x=60, y=80)
+    try:
+        img = Image.open(user_photo_path)
+    except FileNotFoundError:
+        # Imagen default si no existe foto personalizada
+        img = Image.open(Path(__file__).resolve().parents[2] / "images" / "default.jpg")
+
+    img = img.resize((140, 140))
+    img_tk = ImageTk.PhotoImage(img)
+    canvas.create_image(0, 0, anchor="nw", image=img_tk)
+    canvas.image = img_tk  
 
     # Info del estudiante
     tk.Label(frame, text=usuarioInfo["nombre"], font=("Helvetica", 12, "bold"), bg="white").place(x=200, y=40)
     tk.Label(frame, text="CARRERA:", font=("Helvetica", 10, "bold"), fg="#801434", bg="white").place(x=200, y=80)
-    tk.Label(frame, text=usuarioInfo['carrera'], font=("Helvetica", 10), bg="white").place(x=280, y=80)
+    tk.Label(frame, text=usuarioInfo['carrera'], font=("Helvetica", 10), bg="white").place(x=270, y=80)
     tk.Label(frame, text="MATRÍCULA:", font=("Helvetica", 10, "bold"), fg="#801434", bg="white").place(x=200, y=105)
     tk.Label(frame, text=usuarioInfo['matricula'], font=("Helvetica", 10), bg="white").place(x=285, y=105)
     tk.Label(frame, text="CÉDULA:", font=("Helvetica", 10, "bold"), fg="#801434", bg="white").place(x=200, y=130)
@@ -91,13 +94,12 @@ def abrirVentanaPerfil(usuarioInfo, ventana_login):
         materias_lista.extend(materias)
     materias_lista.sort()
 
-    # Panel de la malla a la izquierda (Canvas para zoom)
+    # Panel de la malla a la izquierda
     tk.Label(frame, text="MALLA CURRICULAR", font=("Helvetica", 10, "bold"), fg="#801434", bg="white").place(x=30, y=220)
     frame_malla = tk.Frame(frame, bg="white", bd=3, relief="solid", width=1050, height=700)
     frame_malla.place(x=30, y=245)
     frame_malla.pack_propagate(False)
 
-    # Canvas para imagen con scroll y zoom
     malla_canvas = tk.Canvas(frame_malla, width=1045, height=695, bg="white", highlightthickness=0)
     malla_canvas.pack(fill="both", expand=True)
 
@@ -135,28 +137,26 @@ def abrirVentanaPerfil(usuarioInfo, ventana_login):
 
     G = getMalla()
 
-    # ---- Imagen de malla general inicial (genera si no existe) ----
     malla_path = Path("malla.png")
     if not malla_path.exists():
         dibujarMalla(G)
     malla_img = None
 
-    # ----- FUNCIONES DE ZOOM Y MOSTRAR IMAGEN -----
-
     scale_factor = 1.0
     malla_canvas.imgtk = None
-
+    
     def cargar_y_mostrar_imagen(path, reset_zoom=True):
         nonlocal malla_img, scale_factor
         try:
             img = Image.open(path)
             if reset_zoom:
-                scale_factor = 1.0
+                scale_factor = 0.3
             w, h = int(img.width * scale_factor), int(img.height * scale_factor)
             img = img.resize((w, h), Image.LANCZOS)
+            
             malla_img = ImageTk.PhotoImage(img)
             malla_canvas.delete("all")
-            malla_canvas.imgtk = malla_img  # Mantener referencia
+            malla_canvas.imgtk = malla_img  
             malla_canvas.create_image(0, 0, anchor="nw", image=malla_img)
             malla_canvas.config(scrollregion=malla_canvas.bbox("all"))
         except Exception as e:
@@ -175,8 +175,8 @@ def abrirVentanaPerfil(usuarioInfo, ventana_login):
         cargar_y_mostrar_imagen(malla_canvas.current_image_path, reset_zoom=False)
 
     malla_canvas.bind("<MouseWheel>", zoom)
-    malla_canvas.bind("<Button-4>", zoom)  # Linux
-    malla_canvas.bind("<Button-5>", zoom)  # Linux
+    malla_canvas.bind("<Button-4>", zoom)  
+    malla_canvas.bind("<Button-5>", zoom)  
 
     def mostrar_malla_general():
         malla_canvas.current_image_path = str(malla_path)

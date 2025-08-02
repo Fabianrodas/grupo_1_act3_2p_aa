@@ -56,7 +56,7 @@ usuariosValidos = {
 
 ventana = tk.Tk()
 ventana.title("Portal de Servicios UEES")
-ventana.geometry("1000x550")  # Para cambiar el tamaño de la ventana
+ventana.geometry("750x550")  # Para cambiar el tamaño de la ventana
 ventana.resizable(False, False) 
 ventana.configure(bg="#7b002c")
 
