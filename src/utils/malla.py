@@ -1,7 +1,7 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
-from utils.consts import *
+from src.utils.consts import *
 from pathlib import Path
 import unicodedata
 from matplotlib.patches import FancyArrowPatch

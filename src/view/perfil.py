@@ -2,11 +2,12 @@ import sys
 from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parents[2]))
 import tkinter as tk
-from tkinter import filedialog, ttk
+from tkinter import ttk
 from PIL import Image, ImageTk
 from src.utils.consts import *
-from src.utils.malla import getMalla, dibujarMalla, dibujarPrerequisitos, obtener_info_materia
+from src.utils.malla import getMalla, dibujarMalla, dibujarPrerequisitos
 from src.logic.dfs import DFS_prerequisitos
+from src.logic.bfs import BFS_prerequisitos
 
 def normaliza_nombre(nombre):
     t = str.maketrans("áéíóúñÁÉÍÓÚ", "aeiounAEIOU")
@@ -33,10 +34,11 @@ def abrirVentanaPerfil(usuarioInfo, ventana_login):
         logo_img = logo_img.resize((160, 50), Image.LANCZOS)
         logo_tk = ImageTk.PhotoImage(logo_img)
         tk.Label(barra_superior, image=logo_tk, bg="#7b002c").pack(side="left", padx=10, pady=5)
-    except Exception as e:
+    except:
         tk.Label(barra_superior, text="UEES", font=("Helvetica", 12, "bold"),
                  bg="#7b002c", fg="white").pack(side="left", padx=10)
 
+    # Menú usuario
     opciones_usuario = tk.Menu(perfil_ventana, tearoff=0)
     opciones_usuario.add_command(label="Cerrar Sesión", command=lambda: cerrar_ventana(perfil_ventana, ventana_login))
 
@@ -49,29 +51,22 @@ def abrirVentanaPerfil(usuarioInfo, ventana_login):
     usuario_btn.pack(side="right", padx=20)
     usuario_btn.bind("<Button-1>", mostrar_menu)
 
-    def on_hover(event):
-        usuario_btn.config(bg="#5a001f")
+    # Hover
+    usuario_btn.bind("<Enter>", lambda e: usuario_btn.config(bg="#5a001f"))
+    usuario_btn.bind("<Leave>", lambda e: usuario_btn.config(bg="#7b002c"))
 
-    def on_leave(event):
-        usuario_btn.config(bg="#7b002c")
-
-    usuario_btn.bind("<Enter>", on_hover)
-    usuario_btn.bind("<Leave>", on_leave)
-
+    # Frame general
     frame = tk.Frame(perfil_ventana, bg="white")
     frame.pack(fill="both", expand=True)
 
-    # Foto del estudiante
+    # Foto estudiante
     canvas = tk.Canvas(frame, width=140, height=140, bg="white", highlightthickness=1, highlightbackground="black")
     canvas.place(x=50, y=40)
 
-    # Ruta de imagen automática según el usuario
     user_photo_path = Path(__file__).resolve().parents[2] / "images" / f"{usuarioInfo['usuario']}.jpg"
-
     try:
         img = Image.open(user_photo_path)
     except FileNotFoundError:
-        # Imagen default si no existe foto personalizada
         img = Image.open(Path(__file__).resolve().parents[2] / "images" / "default.jpg")
 
     img = img.resize((140, 140))
@@ -79,7 +74,7 @@ def abrirVentanaPerfil(usuarioInfo, ventana_login):
     canvas.create_image(0, 0, anchor="nw", image=img_tk)
     canvas.image = img_tk  
 
-    # Info del estudiante
+    # Info estudiante
     tk.Label(frame, text=usuarioInfo["nombre"], font=("Helvetica", 12, "bold"), bg="white").place(x=200, y=40)
     tk.Label(frame, text="CARRERA:", font=("Helvetica", 10, "bold"), fg="#801434", bg="white").place(x=200, y=80)
     tk.Label(frame, text=usuarioInfo['carrera'], font=("Helvetica", 10), bg="white").place(x=270, y=80)
@@ -90,12 +85,13 @@ def abrirVentanaPerfil(usuarioInfo, ventana_login):
     tk.Label(frame, text="GPA:", font=("Helvetica", 10, "bold"), fg="#801434", bg="white").place(x=200, y=155)
     tk.Label(frame, text=usuarioInfo['gpa'], font=("Helvetica", 10), bg="white").place(x=235, y=155)
 
+    # Lista de materias
     materias_lista = []
     for materias in SEMESTRES.values():
         materias_lista.extend(materias)
     materias_lista.sort()
 
-    # Panel de la malla a la izquierda
+    # Panel malla
     tk.Label(frame, text="MALLA CURRICULAR", font=("Helvetica", 10, "bold"), fg="#801434", bg="white").place(x=30, y=220)
     frame_malla = tk.Frame(frame, bg="white", bd=3, relief="solid", width=1050, height=700)
     frame_malla.place(x=30, y=245)
@@ -111,47 +107,76 @@ def abrirVentanaPerfil(usuarioInfo, ventana_login):
     h_scroll.pack(side="bottom", fill="x")
     v_scroll.pack(side="right", fill="y")
 
-    # Panel derecho (combobox + info)
-    right_panel = tk.Frame(frame, bg="white")
+    right_panel = tk.Frame(frame, bg="white", width=350, height=500)
     right_panel.place(x=1150, y=245)
+    right_panel.pack_propagate(False)
 
-    combo_materias = ttk.Combobox(
-        right_panel,
-        values=["Selecciona una materia"] + materias_lista,
-        state="readonly",
-        font=("Helvetica", 13),
-        width=28
-    )
+    # Tipo de algoritmo
+    tk.Label(right_panel, text="TIPO DE ALGORITMO:", font=("Helvetica", 14, "bold"),
+             bg="#7b002c", fg="white", width=30).pack(pady=15)
+    algoritmo_var = tk.StringVar(value="DFS")
+    tk.Radiobutton(right_panel, text="BFS", variable=algoritmo_var, value="BFS", bg="white", font=("Helvetica", 12)).pack(anchor="w", padx=40)
+    tk.Radiobutton(right_panel, text="DFS", variable=algoritmo_var, value="DFS", bg="white", font=("Helvetica", 12)).pack(anchor="w", padx=40)
+
+    # Recorrer por
+    tk.Label(right_panel, text="RECORRER POR:", font=("Helvetica", 14, "bold"),
+             bg="#7b002c", fg="white", width=30).pack(pady=15)
+    recorrido_var = tk.StringVar(value="Pre-requisitos")
+    tk.Radiobutton(right_panel, text="Pre-requisitos", variable=recorrido_var, value="Pre-requisitos", bg="white", font=("Helvetica", 12)).pack(anchor="w", padx=40)
+    tk.Radiobutton(right_panel, text="Post-requisitos", variable=recorrido_var, value="Post-requisitos", bg="white", font=("Helvetica", 12)).pack(anchor="w", padx=40)
+
+    # Seleccionar materia
+    tk.Label(right_panel, text="SELECCIONAR MATERIA:", font=("Helvetica", 14, "bold"),
+             bg="#7b002c", fg="white", width=30).pack(pady=15)
+    combo_materias = ttk.Combobox(right_panel, values=["Selecciona una materia"] + materias_lista, state="readonly", font=("Helvetica", 13), width=28)
     combo_materias.set("Selecciona una materia")
-    combo_materias.grid(row=0, column=0, padx=5, pady=10)
+    combo_materias.pack(pady=10)
 
-    info_label = tk.Label(
-        right_panel,
-        text="",
-        font=("Helvetica", 13),
-        bg="white",
-        anchor="nw",
-        justify="left",
-        fg="#7b002c"
-    )
-    info_label.grid(row=1, column=0, sticky="nw")
+    def enviar_accion():
+        materia = combo_materias.get()
+        if materia == "Selecciona una materia":
+            mostrar_malla_general()
+            return
 
+        algoritmo = algoritmo_var.get()
+        recorrido = recorrido_var.get()
+
+        if recorrido == "Post-requisitos":
+            malla_canvas.delete("all")
+            malla_canvas.create_text(20, 20, anchor="nw", text="Aún no está implementada.", fill="black")
+            return
+
+        G = getMalla()
+        prereqs = BFS_prerequisitos(G, materia) if algoritmo == "BFS" else DFS_prerequisitos(G, materia)
+        prereqs = list(prereqs)
+
+        ruta_img = obtener_imagen_prerequisitos(materia)
+        ok = dibujarPrerequisitos(G, materia, prereqs)
+        if ok and ruta_img.exists():
+            cargar_y_mostrar_imagen(str(ruta_img))
+        else:
+            malla_canvas.delete("all")
+            malla_canvas.create_text(20, 20, anchor="nw", text=f"No se pudo generar imagen para:\n{materia}", fill="black")
+
+    enviar_btn = tk.Button(right_panel, text="Enviar", font=("Helvetica", 13, "bold"),
+                           bg="#7b002c", fg="white", width=18, height=2, command=enviar_accion)
+    enviar_btn.pack(pady=25)
+
+    # Funciones de la malla
     G = getMalla()
-
     malla_path = Path("malla.png")
     if not malla_path.exists():
         dibujarMalla(G)
-    malla_img = None
 
-    scale_factor = 1.0
-    malla_canvas.imgtk = None
-    
+    malla_img = None
+    scale_factor = 1
+
     def cargar_y_mostrar_imagen(path, reset_zoom=True):
         nonlocal malla_img, scale_factor
         try:
             img = Image.open(path)
             if reset_zoom:
-                scale_factor = 0.3
+                scale_factor = 0.8
             w, h = int(img.width * scale_factor), int(img.height * scale_factor)
             img = img.resize((w, h), Image.LANCZOS)
             
@@ -160,10 +185,17 @@ def abrirVentanaPerfil(usuarioInfo, ventana_login):
             malla_canvas.imgtk = malla_img  
             malla_canvas.create_image(0, 0, anchor="nw", image=malla_img)
             malla_canvas.config(scrollregion=malla_canvas.bbox("all"))
-        except Exception as e:
+            malla_canvas.current_image_path = path
+        except:
             malla_canvas.delete("all")
             malla_canvas.create_text(20, 20, anchor="nw", text=f"Error cargando imagen", fill="black")
 
+    def mostrar_malla_general():
+        cargar_y_mostrar_imagen(str(malla_path))
+
+    mostrar_malla_general()
+
+    # Zoom
     def zoom(event):
         nonlocal scale_factor
         if malla_img is None:
@@ -179,44 +211,6 @@ def abrirVentanaPerfil(usuarioInfo, ventana_login):
     malla_canvas.bind("<Button-4>", zoom)  
     malla_canvas.bind("<Button-5>", zoom)  
 
-    def mostrar_malla_general():
-        malla_canvas.current_image_path = str(malla_path)
-        cargar_y_mostrar_imagen(malla_canvas.current_image_path)
-
-    mostrar_malla_general()
-
-    def mostrar_prerequisitos(event):
-        materia = combo_materias.get()
-        if materia == "Selecciona una materia":
-            mostrar_malla_general()
-            info_label.config(text="")
-            return
-
-        prereqs = DFS_prerequisitos(G, materia)
-        prereqs = list(prereqs - {materia}) if materia in prereqs else list(prereqs)
-
-        ruta_img = obtener_imagen_prerequisitos(materia)
-        ok = dibujarPrerequisitos(G, materia, prereqs)
-        if ok and ruta_img.exists():
-            malla_canvas.current_image_path = str(ruta_img)
-            cargar_y_mostrar_imagen(malla_canvas.current_image_path)
-        else:
-            malla_canvas.delete("all")
-            malla_canvas.create_text(20, 20, anchor="nw",
-                                    text=f"No se pudo generar imagen para:\n{materia}", fill="black")
-
-        info = obtener_info_materia(G, materia)
-        if isinstance(info, dict) and "Error" not in info:
-            texto = (
-                f"CÓDIGO: {info.get('Código','N/A')}\n"
-                f"PROFESOR: {info.get('Profesor','No registrado')}\n"
-                f"HORARIO: {info.get('Horario','No registrado')}"
-            )
-            info_label.config(text=texto)
-        else:
-            info_label.config(text="No hay información registrada para esta materia.")
-
-    combo_materias.bind("<<ComboboxSelected>>", mostrar_prerequisitos)
     perfil_ventana.logo = logo_tk if 'logo_tk' in locals() else None
 
 def cerrar_ventana(ventana, ventana_login):
