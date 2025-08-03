@@ -15,7 +15,7 @@ def normaliza_nombre(nombre):
 
 def obtener_imagen_prerequisitos(materia):
     nombre_img = normaliza_nombre(materia)
-    return Path(f"prerequsitos_{nombre_img}.png")
+    return Path(f"prerequisitos_{nombre_img}.png")
 
 def abrirVentanaPerfil(usuarioInfo, ventana_login):
     perfil_ventana = tk.Toplevel()
@@ -23,6 +23,13 @@ def abrirVentanaPerfil(usuarioInfo, ventana_login):
     perfil_ventana.state('zoomed')
     perfil_ventana.resizable(False, False)
     perfil_ventana.configure(bg="white")
+    
+    def cerrar_todo():
+        perfil_ventana.destroy()
+        ventana_login.destroy()  # Esto cierra todo el programa
+
+    # Captura la X de la ventana
+    perfil_ventana.protocol("WM_DELETE_WINDOW", cerrar_todo)
 
     # Barra superior
     barra_superior = tk.Frame(perfil_ventana, bg="#7b002c", height=80)
@@ -93,11 +100,11 @@ def abrirVentanaPerfil(usuarioInfo, ventana_login):
 
     # Panel malla
     tk.Label(frame, text="MALLA CURRICULAR", font=("Helvetica", 10, "bold"), fg="#801434", bg="white").place(x=30, y=220)
-    frame_malla = tk.Frame(frame, bg="white", bd=3, relief="solid", width=1050, height=700)
-    frame_malla.place(x=30, y=245)
+    frame_malla = tk.Frame(frame, bg="white", bd=3, relief="solid")
+    frame_malla.place(relx=0.03, rely=0.33, relwidth=0.52, relheight=0.62)
     frame_malla.pack_propagate(False)
 
-    malla_canvas = tk.Canvas(frame_malla, width=1045, height=695, bg="white", highlightthickness=0)
+    malla_canvas = tk.Canvas(frame_malla, width=1045, height=700, bg="white", highlightthickness=0)
     malla_canvas.pack(fill="both", expand=True)
 
     h_scroll = tk.Scrollbar(frame_malla, orient="horizontal", command=malla_canvas.xview)
@@ -107,7 +114,7 @@ def abrirVentanaPerfil(usuarioInfo, ventana_login):
     v_scroll.pack(side="right", fill="y")
 
     right_panel = tk.Frame(frame, bg="white", width=350, height=500)
-    right_panel.place(x=1150, y=245)
+    right_panel.pack(side="right", padx=250, pady=(0,220)) 
     right_panel.pack_propagate(False)
 
     # Tipo de algoritmo
@@ -172,14 +179,14 @@ def abrirVentanaPerfil(usuarioInfo, ventana_login):
         dibujarMalla(G)
 
     malla_img = None
-    scale_factor = 1
+    scale_factor = 0.6
 
     def cargar_y_mostrar_imagen(path, reset_zoom=True):
         nonlocal malla_img, scale_factor
         try:
             img = Image.open(path)
             if reset_zoom:
-                scale_factor = 0.8
+                scale_factor = 0.6
             w, h = int(img.width * scale_factor), int(img.height * scale_factor)
             img = img.resize((w, h), Image.LANCZOS)
             

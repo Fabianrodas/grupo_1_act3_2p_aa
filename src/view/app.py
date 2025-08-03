@@ -34,7 +34,7 @@ usuariosValidos = {
         "carrera": "INGENIERÍA EN CIENCIAS DE LA COMPUTACIÓN",
         "matricula": "2023240011",
         "cedula": "0904568766",
-        "gpa": 89
+        "gpa": 90
     },
     "dylan.drouet": {
         "contraseña": "dylandrouet",
@@ -59,6 +59,11 @@ ventana.title("Portal de Servicios UEES")
 ventana.geometry("750x550")  # Para cambiar el tamaño de la ventana
 ventana.resizable(False, False) 
 ventana.configure(bg="#7b002c")
+
+def cerrar_todo_principal():
+    ventana.destroy()
+
+ventana.protocol("WM_DELETE_WINDOW", cerrar_todo_principal)
 
 # Frame izquierdo
 frame_izquierdo = tk.Frame(ventana, width=500, bg="#7b002c") # Por si necesito cambiar el tamaño del lado izquierdo, modificar width
