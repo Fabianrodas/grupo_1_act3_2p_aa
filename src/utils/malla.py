@@ -1,10 +1,14 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
-from src.utils.consts import *
+from utils.consts import *
 from pathlib import Path
-import textwrap
 import unicodedata
+from matplotlib.patches import FancyArrowPatch
+from matplotlib.patches import PathPatch
+from matplotlib.path import Path as Path2
+import textwrap
+import numpy as np
 
 def normaliza_nombre(nombre):
     # Elimina tildes y reemplaza espacios por "_"
@@ -49,8 +53,72 @@ def dibujarMalla(G, filename="malla.png"):
                 pos[materia] = ((i + offset) * espacio_x, -nivel * espacio_y)
         nx.draw_networkx_edges(
             G, pos, arrows=True, arrowstyle='-', connectionstyle='arc3,rad=0.0',
-            width=1, edge_color="black", ax=ax
+            width=0, edge_color="black", ax=ax
         )
+
+        LEVEL_X_NODE = 4.8
+        LEVEL_Y_NODE = 2.5
+        for relations in G.edges():
+            po = np.array(pos[relations[0]])
+            pi = np.array(pos[relations[1]])
+            current_y = -LEVEL_Y_NODE/2 if po[1] != pi[1] else 0
+            current_x = 0
+            verts = []
+            verts.append(po)
+            
+            if(po[1] != pi[1]):
+                verts.append(po + np.array([current_x, current_y]))
+
+            delta_x = round(-(po[0] + current_x - pi[0]),1)
+            delta_y = round(-(po[1] + current_y - pi[1]),1)
+            #and ((round(po[0] + current_x - pi[0],1) != LEVEL_X_NODE/2 or round(po[0] + current_x - pi[0],1) != -LEVEL_X_NODE/2) and po[0] + current_y < pi[0] )):
+
+            while(delta_x != 0 or delta_y != 0):
+
+                if(delta_x > 25 or delta_y > 25):
+                    break
+
+                delta_x = round(-(po[0] + current_x - pi[0]),1)
+                delta_y = round(-(po[1] + current_y - pi[1]),1)
+
+                if(po[1] + current_y != pi[1]):
+                    if((round(po[0] + current_x - pi[0],2) == LEVEL_X_NODE/2 or round(po[0] + current_x - pi[0],2) == -LEVEL_X_NODE/2) and po[1] < pi[1]):
+                        current_y += LEVEL_Y_NODE/2
+                    else:
+                        if(round(-((po[0] + current_x) -  pi[0]), 1) < 0):
+                            current_x += -LEVEL_X_NODE/2
+                        elif(round(-((po[0] + current_x) - pi[0]), 1) > 0):
+                            current_x += LEVEL_X_NODE/2
+                        elif(round(-((po[1] + current_y) - pi[1]), 1) > 0):
+                            current_y += LEVEL_Y_NODE/2
+                        else:
+                            current_y += -LEVEL_Y_NODE/2
+                else:
+                    if((round(po[0] + current_x - pi[0],1) >= -4.8 and po[0] < pi[0])  or (round(po[0] + current_x - pi[0],1) <= 4.8 and po[0] > pi[0])):
+                        if(round(-((po[0] + current_x) - pi[0]), 1) < 0):
+                            current_x += -LEVEL_X_NODE/2
+                        else:
+                            current_x += LEVEL_X_NODE/2
+                    else:
+                        current_y += -LEVEL_Y_NODE/2
+                if(round(po[0] + current_x,1) == round(pi[0],1) and round(po[1] + current_y,1) == round(pi[1],1)):
+                    break
+                verts.append(po + np.array([current_x, current_y]))
+
+            verts.append(pi)
+
+            codes = [Path2.MOVETO] + [Path2.LINETO] * (len(verts) - 1)
+            path = Path2(verts, codes)
+            arrow = FancyArrowPatch(
+                path=path,
+                arrowstyle='->',
+                color='black',
+                lw=1,
+                mutation_scale=15
+            )
+            ax.add_patch(arrow)
+
+
         for node, (x, y) in pos.items():
             color = COLOR_NODOS.get(node, "#a7caf7")
             rect = patches.FancyBboxPatch(
@@ -109,10 +177,75 @@ def dibujarPrerequisitos(G, materia_principal, materias_resaltadas=None, filenam
             edgelist=edges_to_draw,
             arrows=True,
             arrowstyle='-|>',
-            width=2,
+            width=0,
             edge_color="red",
             ax=ax
         )
+
+        
+        LEVEL_X_NODE = 4.8
+        LEVEL_Y_NODE = 2.5
+        for relations in edges_to_draw:
+            po = np.array(pos[relations[0]])
+            pi = np.array(pos[relations[1]])
+            current_y = -LEVEL_Y_NODE/2 if po[1] != pi[1] else 0
+            current_x = 0
+            verts = []
+            verts.append(po)
+            
+            if(po[1] != pi[1]):
+                verts.append(po + np.array([current_x, current_y]))
+
+            delta_x = round(-(po[0] + current_x - pi[0]),1)
+            delta_y = round(-(po[1] + current_y - pi[1]),1)
+            #and ((round(po[0] + current_x - pi[0],1) != LEVEL_X_NODE/2 or round(po[0] + current_x - pi[0],1) != -LEVEL_X_NODE/2) and po[0] + current_y < pi[0] )):
+
+            while(delta_x != 0 or delta_y != 0):
+
+                if(delta_x > 25 or delta_y > 25):
+                    break
+
+                delta_x = round(-(po[0] + current_x - pi[0]),1)
+                delta_y = round(-(po[1] + current_y - pi[1]),1)
+
+                if(po[1] + current_y != pi[1]):
+                    if((round(po[0] + current_x - pi[0],2) == LEVEL_X_NODE/2 or round(po[0] + current_x - pi[0],2) == -LEVEL_X_NODE/2) and po[1] < pi[1]):
+                        current_y += LEVEL_Y_NODE/2
+                    else:
+                        if(round(-((po[0] + current_x) -  pi[0]), 1) < 0):
+                            current_x += -LEVEL_X_NODE/2
+                        elif(round(-((po[0] + current_x) - pi[0]), 1) > 0):
+                            current_x += LEVEL_X_NODE/2
+                        elif(round(-((po[1] + current_y) - pi[1]), 1) > 0):
+                            current_y += LEVEL_Y_NODE/2
+                        else:
+                            current_y += -LEVEL_Y_NODE/2
+                else:
+                    if((round(po[0] + current_x - pi[0],1) >= -4.8 and po[0] < pi[0])  or (round(po[0] + current_x - pi[0],1) <= 4.8 and po[0] > pi[0])):
+                        if(round(-((po[0] + current_x) - pi[0]), 1) < 0):
+                            current_x += -LEVEL_X_NODE/2
+                        else:
+                            current_x += LEVEL_X_NODE/2
+                    else:
+                        current_y += -LEVEL_Y_NODE/2
+                if(round(po[0] + current_x,1) == round(pi[0],1) and round(po[1] + current_y,1) == round(pi[1],1)):
+                    break
+                verts.append(po + np.array([current_x, current_y]))
+
+            verts.append(pi)
+
+            codes = [Path2.MOVETO] + [Path2.LINETO] * (len(verts) - 1)
+            path = Path2(verts, codes)
+            arrow = FancyArrowPatch(
+                path=path,
+                arrowstyle='->',
+                color='black',
+                lw=1,
+                mutation_scale=15
+            )
+            ax.add_patch(arrow)
+
+
         # Nodos (resaltados y no resaltados)
         for node, (x, y) in pos.items():
             if node == materia_principal:

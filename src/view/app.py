@@ -4,7 +4,7 @@ sys.path.append(str(Path(__file__).resolve().parents[2]))
 import tkinter as tk
 from tkinter import messagebox
 from PIL import Image, ImageTk
-from src.view.perfil import abrirVentanaPerfil
+from perfil import abrirVentanaPerfil
 
 def login():
     usuario = entry_usuario.get()

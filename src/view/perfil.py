@@ -1,9 +1,10 @@
 import sys
 from pathlib import Path
+sys.path.append(str(Path(__file__).resolve().parents[2]))
 import tkinter as tk
 from tkinter import filedialog, ttk
 from PIL import Image, ImageTk
-from src.utils.consts import SEMESTRES
+from src.utils.consts import *
 from src.utils.malla import getMalla, dibujarMalla, dibujarPrerequisitos, obtener_info_materia
 from src.logic.dfs import DFS_prerequisitos
 
