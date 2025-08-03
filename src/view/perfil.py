@@ -100,7 +100,6 @@ def abrirVentanaPerfil(usuarioInfo, ventana_login):
     malla_canvas = tk.Canvas(frame_malla, width=1045, height=695, bg="white", highlightthickness=0)
     malla_canvas.pack(fill="both", expand=True)
 
-    # Scrollbars
     h_scroll = tk.Scrollbar(frame_malla, orient="horizontal", command=malla_canvas.xview)
     v_scroll = tk.Scrollbar(frame_malla, orient="vertical", command=malla_canvas.yview)
     malla_canvas.config(xscrollcommand=h_scroll.set, yscrollcommand=v_scroll.set)
@@ -160,7 +159,11 @@ def abrirVentanaPerfil(usuarioInfo, ventana_login):
 
     enviar_btn = tk.Button(right_panel, text="Enviar", font=("Helvetica", 13, "bold"),
                            bg="#7b002c", fg="white", width=18, height=2, command=enviar_accion)
-    enviar_btn.pack(pady=25)
+    enviar_btn.pack(pady=10)
+
+    descargar_btn = tk.Button(right_panel, text="Descargar Benchmark", font=("Helvetica", 13, "bold"),
+                              bg="#7b002c", fg="white", width=18, height=2) 
+    descargar_btn.pack(pady=10)
 
     # Funciones de la malla
     G = getMalla()
@@ -195,7 +198,6 @@ def abrirVentanaPerfil(usuarioInfo, ventana_login):
 
     mostrar_malla_general()
 
-    # Zoom
     def zoom(event):
         nonlocal scale_factor
         if malla_img is None:
