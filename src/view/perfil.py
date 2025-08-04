@@ -104,15 +104,82 @@ def abrirVentanaPerfil(usuarioInfo, ventana_login):
     frame_malla.place(relx=0.03, rely=0.33, relwidth=0.52, relheight=0.62)
     frame_malla.pack_propagate(False)
 
+    # Variables de Zoom y Drag
+    scale_factor = 0.6
+    offset_x = 0
+    offset_y = 0
+    last_mouse_x = 0
+    last_mouse_y = 0
+    malla_img = None
+    current_image_path = "malla.png"
+    tk_img = None
+    
     malla_canvas = tk.Canvas(frame_malla, width=1045, height=700, bg="white", highlightthickness=0)
     malla_canvas.pack(fill="both", expand=True)
 
-    h_scroll = tk.Scrollbar(frame_malla, orient="horizontal", command=malla_canvas.xview)
-    v_scroll = tk.Scrollbar(frame_malla, orient="vertical", command=malla_canvas.yview)
-    malla_canvas.config(xscrollcommand=h_scroll.set, yscrollcommand=v_scroll.set)
-    h_scroll.pack(side="bottom", fill="x")
-    v_scroll.pack(side="right", fill="y")
+    # Funciones para cargar y mostrar la imagen de la malla
+    def cargar_y_mostrar_imagen(image_path, reset_zoom=True):
+        nonlocal scale_factor, offset_x, offset_y, malla_img, tk_img, current_image_path
+        malla_img = Image.open(image_path)
+        w, h = malla_img.size
+        if reset_zoom:
+            scale_factor = 1.0
+            offset_x = 0
+            offset_y = 0
+        display_img = malla_img.resize((int(w*scale_factor), int(h*scale_factor)), Image.LANCZOS)
+        tk_img = ImageTk.PhotoImage(display_img)
+        malla_canvas.delete("all")
+        malla_canvas.create_image(offset_x, offset_y, anchor="nw", image=tk_img)
+        malla_canvas.image = tk_img
+        current_image_path = image_path
 
+    def zoom(event):
+        nonlocal scale_factor, offset_x, offset_y, malla_img
+        if malla_img is None:
+            return
+        mouse_x = malla_canvas.canvasx(event.x)
+        mouse_y = malla_canvas.canvasy(event.y)
+        old_scale = scale_factor
+        if event.delta > 0 or getattr(event, "num", None) == 4:
+            scale_factor *= 1.1
+        elif event.delta < 0 or getattr(event, "num", None) == 5:
+            scale_factor /= 1.1
+        scale_factor = max(0.2, min(scale_factor, 3.0))
+        rel_x = (mouse_x - offset_x) / old_scale
+        rel_y = (mouse_y - offset_y) / old_scale
+        offset_x = mouse_x - rel_x * scale_factor
+        offset_y = mouse_y - rel_y * scale_factor
+        cargar_y_mostrar_imagen(current_image_path, reset_zoom=False)
+
+    def start_drag(event):
+        nonlocal last_mouse_x, last_mouse_y
+        last_mouse_x = event.x
+        last_mouse_y = event.y
+
+    def drag(event):
+        nonlocal offset_x, offset_y, last_mouse_x, last_mouse_y
+        dx = event.x - last_mouse_x
+        dy = event.y - last_mouse_y
+        offset_x += dx
+        offset_y += dy
+        cargar_y_mostrar_imagen(current_image_path, reset_zoom=False)
+        last_mouse_x = event.x
+        last_mouse_y = event.y
+
+    malla_canvas.bind("<MouseWheel>", zoom)
+    malla_canvas.bind("<Button-4>", zoom)
+    malla_canvas.bind("<Button-5>", zoom)
+    malla_canvas.bind("<ButtonPress-1>", start_drag)
+    malla_canvas.bind("<B1-Motion>", drag)
+
+    # Inicializa la malla general
+    G = getMalla()
+    malla_path = Path("malla.png")
+    if not malla_path.exists():
+        dibujarMalla(G)
+    cargar_y_mostrar_imagen(str(malla_path))
+
+    # Panel derecho
     right_panel = tk.Frame(frame, bg="white", width=350, height=500)
     right_panel.pack(side="right", padx=250, pady=(0,220)) 
     right_panel.pack_propagate(False)
@@ -141,12 +208,11 @@ def abrirVentanaPerfil(usuarioInfo, ventana_login):
     def enviar_accion():
         materia = combo_materias.get()
         if materia == "Selecciona una materia":
-            mostrar_malla_general()
+            cargar_y_mostrar_imagen(str(malla_path), reset_zoom=True)
             return
 
         algoritmo = algoritmo_var.get()
         recorrido = recorrido_var.get()
-
         if recorrido == "Post-requisitos":
             malla_canvas.delete("all")
             malla_canvas.create_text(20, 20, anchor="nw", text="Aún no está implementada.", fill="black")
@@ -155,11 +221,10 @@ def abrirVentanaPerfil(usuarioInfo, ventana_login):
         G = getMalla()
         prereqs = BFS_prerequisitos(G, materia) if algoritmo == "BFS" else DFS_prerequisitos(G, materia)
         prereqs = list(prereqs)
-
         ruta_img = obtener_imagen_prerequisitos(materia)
         ok = dibujarPrerequisitos(G, materia, prereqs)
         if ok and ruta_img.exists():
-            cargar_y_mostrar_imagen(str(ruta_img))
+            cargar_y_mostrar_imagen(str(ruta_img), reset_zoom=True)
         else:
             malla_canvas.delete("all")
             malla_canvas.create_text(20, 20, anchor="nw", text=f"No se pudo generar imagen para:\n{materia}", fill="black")
@@ -171,54 +236,6 @@ def abrirVentanaPerfil(usuarioInfo, ventana_login):
     descargar_btn = tk.Button(right_panel, text="Descargar Benchmark", font=("Helvetica", 13, "bold"),
                               bg="#7b002c", fg="white", width=18, height=2) 
     descargar_btn.pack(pady=10)
-
-    # Funciones de la malla
-    G = getMalla()
-    malla_path = Path("malla.png")
-    if not malla_path.exists():
-        dibujarMalla(G)
-
-    malla_img = None
-    scale_factor = 0.6
-
-    def cargar_y_mostrar_imagen(path, reset_zoom=True):
-        nonlocal malla_img, scale_factor
-        try:
-            img = Image.open(path)
-            if reset_zoom:
-                scale_factor = 0.6
-            w, h = int(img.width * scale_factor), int(img.height * scale_factor)
-            img = img.resize((w, h), Image.LANCZOS)
-            
-            malla_img = ImageTk.PhotoImage(img)
-            malla_canvas.delete("all")
-            malla_canvas.imgtk = malla_img  
-            malla_canvas.create_image(0, 0, anchor="nw", image=malla_img)
-            malla_canvas.config(scrollregion=malla_canvas.bbox("all"))
-            malla_canvas.current_image_path = path
-        except:
-            malla_canvas.delete("all")
-            malla_canvas.create_text(20, 20, anchor="nw", text=f"Error cargando imagen", fill="black")
-
-    def mostrar_malla_general():
-        cargar_y_mostrar_imagen(str(malla_path))
-
-    mostrar_malla_general()
-
-    def zoom(event):
-        nonlocal scale_factor
-        if malla_img is None:
-            return
-        if event.delta > 0 or event.num == 4:
-            scale_factor *= 1.1
-        elif event.delta < 0 or event.num == 5:
-            scale_factor /= 1.1
-        scale_factor = max(0.2, min(scale_factor, 3.0))
-        cargar_y_mostrar_imagen(malla_canvas.current_image_path, reset_zoom=False)
-
-    malla_canvas.bind("<MouseWheel>", zoom)
-    malla_canvas.bind("<Button-4>", zoom)  
-    malla_canvas.bind("<Button-5>", zoom)  
 
     perfil_ventana.logo = logo_tk if 'logo_tk' in locals() else None
 
