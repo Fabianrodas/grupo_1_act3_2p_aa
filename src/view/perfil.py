@@ -9,6 +9,13 @@ from src.utils.malla import getMalla, dibujarMalla, dibujarPrerequisitos
 from src.logic.dfs import DFS_prerequisitos, DFS_postrequisitos
 from src.logic.bfs import BFS_prerequisitos, BFS_postrequisitos
 from src.view.planificador import abrir_ventana_planificador
+from src.model.benchmark import sortResults
+import timeit
+import pandas as pd
+import psutil
+import winreg
+import os
+import platform
 
 def normaliza_nombre(nombre):
     t = str.maketrans("áéíóúñÁÉÍÓÚ", "aeiounAEIOU")
@@ -198,7 +205,7 @@ def abrirVentanaPerfil(usuarioInfo, ventana_login):
     enviar_btn.pack(pady=10)
 
     descargar_btn = tk.Button(right_panel, text="Descargar Benchmark", font=("Helvetica", 13, "bold"),
-                              bg="#7b002c", fg="white", width=18, height=2) 
+                              bg="#7b002c", fg="white", width=18, height=2, command=lambda: download_benchmark(combo_materias.get(), recorrido_var.get())) 
     descargar_btn.pack(pady=10)
 
     planificador_btn = tk.Button(right_panel, text="Ver Planificador", font=("Helvetica", 13, "bold"),
@@ -216,6 +223,121 @@ def abrirVentanaPerfil(usuarioInfo, ventana_login):
     malla_img = None
     image_id = None
     drag_data = {"x": 0, "y": 0}
+
+    def download_benchmark(materia, recorrido):
+        materias = []
+        tiempos = []
+        
+        if not materia:
+            return
+            
+        algoritmo = algoritmo_var.get()
+        
+        criterio = "prerequisitos" if recorrido == "Pre-requisitos" else "postrequisitos"
+        
+        try:
+            tiempo_list, mpm_list = sortResults(algoritmo, G, materia, criterio, 1000, 1)
+            
+            for tiempo_str in tiempo_list:
+                tiempo = float(tiempo_str.replace("s", "").strip())
+                tiempos.append(tiempo)
+
+                materias.append([])
+            
+            mpm = tuple(mpm_list)
+            
+        except Exception as e:
+            print(f"Error in benchmark: {e}")
+            mpm = ("0.00000 s", "0.00000 s", "0.00000 s")
+        
+        os.makedirs("data", exist_ok=True)
+        nombre_archivo = os.path.join("data", f"benchmark_{materia.replace(' ', '_')}.xlsx")
+        
+        guardar_resultados_csv(nombre_archivo, materias, tiempos, criterio, algoritmo, mpm)
+
+    def guardar_resultados_csv(nombre_archivo, materias, tiempos, criterio, algoritmo, mpm):
+
+        resumen_data = []
+
+        for i, tiempo in enumerate(tiempos):
+            materias_intentos = materias[i] if i < len(materias) else []
+            if materias_intentos and isinstance(materias_intentos, list) and len(materias_intentos) > 0:
+                if isinstance(materias_intentos[0], list):
+                    materias_intentos = materias_intentos[0]
+            else:
+                materias_intentos = []
+
+            resumen_data.append({
+                "Intento": i + 1,
+                "Tiempo (s)": round(float(str(tiempo).replace("s", "").strip()), 6),
+                "Criterio": criterio,
+                "Algoritmo": algoritmo,
+            })
+
+        df_resumen = pd.DataFrame(resumen_data)
+        df_mpm = pd.DataFrame({
+            "Métrica": ["Mínimo", "Promedio", "Máximo"],
+            "Tiempo (s)": [
+                round(float(str(mpm[0]).replace("s", "").strip()), 6),
+                round(float(str(mpm[1]).replace("s", "").strip()), 6),
+                round(float(str(mpm[2]).replace("s", "").strip()), 6),
+            ]
+        })
+        df_sistema = get_sistema_df()
+
+        with pd.ExcelWriter(nombre_archivo) as writer:
+            df_resumen.to_excel(writer, sheet_name="Resumen", index=False)
+            df_mpm.to_excel(writer, sheet_name="Resumen MPM", index=False)
+            df_sistema.to_excel(writer, sheet_name="Sistema", index=False)
+
+    def get_sistema_operativo_real():
+        try:
+            if platform.system() == "Windows":
+                key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\Microsoft\Windows NT\CurrentVersion")
+                product_name, _ = winreg.QueryValueEx(key, "ProductName")
+                winreg.CloseKey(key)
+                return product_name
+            else:
+                return platform.system()
+        except:
+            return platform.system()
+
+    def get_sistema_df():
+        try:
+            usuario = os.getlogin()
+        except:
+            usuario = "Desconocido"
+
+        info = {
+            "Elemento": [
+                "Sistema Operativo",
+                "Versión del OS",
+                "Nombre del Equipo",
+                "Tipo de sistema",
+                "Arquitectura",
+                "Procesador",
+                "Núcleos físicos",
+                "Núcleos lógicos",
+                "RAM Total (GB)",
+                "Memoria ROM / Disco (GB)",
+                "Usuario actual"
+            ],
+            "Valor": [
+                get_sistema_operativo_real(), 
+                platform.version(),
+                platform.node(),
+                platform.architecture()[0],
+                platform.machine(),
+                platform.processor(),
+                psutil.cpu_count(logical=False),
+                psutil.cpu_count(logical=True),
+                f"{psutil.virtual_memory().total / (1024**3):.2f}",
+                f"{psutil.disk_usage('/').total / (1024**3):.2f}",
+                usuario
+            ]
+        }
+
+        return pd.DataFrame(info)
 
     # Funciones de malla
     def cargar_y_mostrar_imagen(path, reset_zoom=True):
