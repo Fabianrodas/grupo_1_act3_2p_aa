@@ -5,7 +5,7 @@ import tkinter as tk
 from tkinter import ttk
 from PIL import Image, ImageTk
 from src.utils.consts import *
-from src.utils.malla import getMalla, dibujarMalla, dibujarPrerequisitos
+from src.utils.malla import getMalla, dibujarMalla, dibujarPrerequisitos, obtener_info_materia
 from src.logic.dfs import DFS_prerequisitos, DFS_postrequisitos
 from src.logic.bfs import BFS_prerequisitos, BFS_postrequisitos
 from src.view.planificador import abrir_ventana_planificador
@@ -125,10 +125,6 @@ def abrirVentanaPerfil(usuarioInfo, ventana_login):
     h_scroll.pack(side="bottom", fill="x")
     v_scroll.pack(side="right", fill="y")
 
-    # Panel derecho
-    right_panel = tk.Frame(frame, bg="white", width=350, height=600)
-    right_panel.pack(side="right", padx=150, pady=50)
-
     # Inicalizar malla
     G = getMalla()
     malla_path = Path("malla.png")
@@ -141,7 +137,7 @@ def abrirVentanaPerfil(usuarioInfo, ventana_login):
 
     # Botón para resetear el zoom de la imagen de la malla (última imagen mostrada)
     malla_path = Path("malla.png")
-    ultima_ruta_img = [str(malla_path)]  # Variable mutable para almacenar la última imagen cargada
+    ultima_ruta_img = [str(malla_path)] 
 
     reset_zoom_btn = tk.Button(
         frame_reset,
@@ -153,6 +149,37 @@ def abrirVentanaPerfil(usuarioInfo, ventana_login):
     )
     reset_zoom_btn.pack()
 
+    # Panel derecho
+    right_panel = tk.Frame(frame, bg="white", width=350, height=600)
+    right_panel.pack(side="right", padx=150, pady=50)
+
+    # Frame de información
+    info_frame = tk.LabelFrame(right_panel, text="Información extra de la materia", bg="white", font=("Helvetica", 12, "bold"))
+    info_frame.pack(fill="both", expand=False, padx=20, pady=10)
+
+    # Campos a mostrar (puedes agregar o quitar)
+    campos = ["Materia", "Código", "Profesor", "Horario"]
+
+    # Diccionario de labels para actualizar fácilmente
+    labels_info = {}
+
+    for campo in campos:
+        frame = tk.Frame(info_frame, bg="white")
+        frame.pack(fill="x", pady=2)
+        lbl_campo = tk.Label(frame, text=f"{campo}:", width=12, anchor="w", bg="white", font=("Helvetica", 10, "bold"))
+        lbl_campo.pack(side="left")
+        lbl_valor = tk.Label(frame, text="---", bg="white", anchor="w", font=("Helvetica", 10))
+        lbl_valor.pack(side="left", fill="x", expand=True)
+        labels_info[campo] = lbl_valor
+    
+    def actualizar_info_materia(materia):
+        G = getMalla()
+        info = obtener_info_materia(G, materia)
+        for campo in campos:
+            valor = info.get(campo, "No registrado")
+            labels_info[campo].config(text=valor)
+
+    
     # Tipo de algoritmo
     tk.Label(right_panel, text="TIPO DE ALGORITMO:", font=("Helvetica", 14, "bold"),
              bg="#7b002c", fg="white", width=30).pack(pady=15)
@@ -178,7 +205,13 @@ def abrirVentanaPerfil(usuarioInfo, ventana_login):
         materia = combo_materias.get()
         if materia == "Selecciona una materia":
             mostrar_malla_general()
+            # Limpia los labels de información
+            for lbl in labels_info.values():
+                lbl.config(text="---")
             return
+        
+        # Actualiza frame de información
+        actualizar_info_materia(materia)
 
         algoritmo = algoritmo_var.get()
         recorrido = recorrido_var.get()
@@ -211,18 +244,6 @@ def abrirVentanaPerfil(usuarioInfo, ventana_login):
     planificador_btn = tk.Button(right_panel, text="Ver Planificador", font=("Helvetica", 13, "bold"),
               bg="#7b002c", fg="white", width=18, height=2, command=abrir_ventana_planificador)
     planificador_btn.pack(pady=10)
-
-    # Funciones de la malla
-    # G = getMalla()
-    # malla_path = Path("malla.png")
-    # if not malla_path.exists():
-    #     dibujarMalla(G)
-
-    # Variables de control
-    scale_factor = 0.6
-    malla_img = None
-    image_id = None
-    drag_data = {"x": 0, "y": 0}
 
     def download_benchmark(materia, recorrido):
         materias = []
@@ -338,6 +359,12 @@ def abrirVentanaPerfil(usuarioInfo, ventana_login):
         }
 
         return pd.DataFrame(info)
+    
+    # Variables de control
+    scale_factor = 0.6
+    malla_img = None
+    image_id = None
+    drag_data = {"x": 0, "y": 0}
 
     # Funciones de malla
     def cargar_y_mostrar_imagen(path, reset_zoom=True):
