@@ -8,6 +8,7 @@ from src.utils.consts import *
 from src.utils.malla import getMalla, dibujarMalla, dibujarPrerequisitos
 from src.logic.dfs import DFS_prerequisitos, DFS_postrequisitos
 from src.logic.bfs import BFS_prerequisitos, BFS_postrequisitos
+from src.view.planificador import abrir_ventana_planificador
 
 def normaliza_nombre(nombre):
     t = str.maketrans("áéíóúñÁÉÍÓÚ", "aeiounAEIOU")
@@ -117,6 +118,10 @@ def abrirVentanaPerfil(usuarioInfo, ventana_login):
     h_scroll.pack(side="bottom", fill="x")
     v_scroll.pack(side="right", fill="y")
 
+    # Panel derecho
+    right_panel = tk.Frame(frame, bg="white", width=350, height=600)
+    right_panel.pack(side="right", padx=150, pady=50)
+
     # Inicalizar malla
     G = getMalla()
     malla_path = Path("malla.png")
@@ -140,11 +145,6 @@ def abrirVentanaPerfil(usuarioInfo, ventana_login):
         command=lambda: cargar_y_mostrar_imagen(ultima_ruta_img[0], reset_zoom=True)
     )
     reset_zoom_btn.pack()
-
-    # Panel derecho
-    right_panel = tk.Frame(frame, bg="white", width=350, height=500)
-    right_panel.pack(side="right", padx=250, pady=(0,220)) 
-    right_panel.pack_propagate(False)
 
     # Tipo de algoritmo
     tk.Label(right_panel, text="TIPO DE ALGORITMO:", font=("Helvetica", 14, "bold"),
@@ -200,6 +200,10 @@ def abrirVentanaPerfil(usuarioInfo, ventana_login):
     descargar_btn = tk.Button(right_panel, text="Descargar Benchmark", font=("Helvetica", 13, "bold"),
                               bg="#7b002c", fg="white", width=18, height=2) 
     descargar_btn.pack(pady=10)
+
+    planificador_btn = tk.Button(right_panel, text="Ver Planificador", font=("Helvetica", 13, "bold"),
+              bg="#7b002c", fg="white", width=18, height=2, command=abrir_ventana_planificador)
+    planificador_btn.pack(pady=10)
 
     # Funciones de la malla
     # G = getMalla()
