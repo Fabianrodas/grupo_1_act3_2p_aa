@@ -149,57 +149,93 @@ def abrirVentanaPerfil(usuarioInfo, ventana_login):
     )
     reset_zoom_btn.pack()
 
-    # Panel derecho
-    right_panel = tk.Frame(frame, bg="white", width=350, height=600)
-    right_panel.pack(side="right", padx=150, pady=50)
+    # ============================
+    # PANEL DERECHO ANCHO Y ESTÉTICO
+    # ============================
 
-    # Frame de información
-    info_frame = tk.LabelFrame(right_panel, text="Información extra de la materia", bg="white", font=("Helvetica", 12, "bold"))
-    info_frame.pack(fill="both", expand=False, padx=20, pady=10)
+    right_panel = tk.Frame(frame, bg="white", width=500, height=1000)  
+    right_panel.pack(side="right", anchor="n", padx=50, pady=10)
+    right_panel.pack_propagate(False)
 
-    # Campos a mostrar (puedes agregar o quitar)
+    # ---------- SECCIÓN 1: Información extra ----------
+    info_frame = tk.LabelFrame(
+        right_panel,
+        text="Información extra de la materia",
+        bg="white",
+        font=("Helvetica", 12, "bold"),
+        padx=10, pady=5,
+        width=380, height=150
+    )
+    info_frame.pack(fill="x", pady=15, padx=10)
+    info_frame.pack_propagate(False) 
+
     campos = ["Materia", "Código", "Profesor", "Horario"]
-
-    # Diccionario de labels para actualizar fácilmente
     labels_info = {}
 
     for campo in campos:
-        frame = tk.Frame(info_frame, bg="white")
-        frame.pack(fill="x", pady=2)
-        lbl_campo = tk.Label(frame, text=f"{campo}:", width=12, anchor="w", bg="white", font=("Helvetica", 10, "bold"))
+        fila = tk.Frame(info_frame, bg="white")
+        fila.pack(fill="x", pady=3)
+        lbl_campo = tk.Label(fila, text=f"{campo}:", width=12, anchor="w", bg="white", font=("Helvetica", 10, "bold"))
         lbl_campo.pack(side="left")
-        lbl_valor = tk.Label(frame, text="---", bg="white", anchor="w", font=("Helvetica", 10))
+        lbl_valor = tk.Label(fila, text="---", bg="white", anchor="w", font=("Helvetica", 10))
         lbl_valor.pack(side="left", fill="x", expand=True)
         labels_info[campo] = lbl_valor
+
+    # ---------- SECCIÓN 2-3-4 + BOTONES ----------
+    param_frame = tk.LabelFrame(
+        right_panel,
+        text="Parámetros de Búsqueda",
+        bg="white",
+        font=("Helvetica", 12, "bold"),
+        padx=10, pady=10,
+        width=380, height=300
+    )
+    param_frame.pack(fill="x", pady=15, padx=10)
+    param_frame.pack_propagate(False)
     
+    btn_frame = tk.Frame(right_panel, bg="white")
+    btn_frame.pack(fill="x", pady=15, padx=10)
+
+    btn_frame.config(height=1220)     
+    btn_frame.pack_propagate(False)
+
+    btn_style = {
+        "font": ("Helvetica", 13, "bold"),
+        "bg": "#7b002c",
+        "fg": "white",
+        "height": 2
+    }
+
+    # --- Tipo de Algoritmo ---
+    tk.Label(param_frame, text="Tipo de Algoritmo", font=("Helvetica", 11, "bold"), bg="white").pack(anchor="w", pady=(0,5))
+    algoritmo_var = tk.StringVar(value="DFS")
+    tk.Radiobutton(param_frame, text="BFS", variable=algoritmo_var, value="BFS", bg="white", font=("Helvetica", 10)).pack(anchor="w", padx=20)
+    tk.Radiobutton(param_frame, text="DFS", variable=algoritmo_var, value="DFS", bg="white", font=("Helvetica", 10)).pack(anchor="w", padx=20)
+
+    # --- Recorrer por ---
+    tk.Label(param_frame, text="Recorrer por", font=("Helvetica", 11, "bold"), bg="white").pack(anchor="w", pady=(10,5))
+    recorrido_var = tk.StringVar(value="Pre-requisitos")
+    tk.Radiobutton(param_frame, text="Pre-requisitos", variable=recorrido_var, value="Pre-requisitos", bg="white", font=("Helvetica", 10)).pack(anchor="w", padx=20)
+    tk.Radiobutton(param_frame, text="Post-requisitos", variable=recorrido_var, value="Post-requisitos", bg="white", font=("Helvetica", 10)).pack(anchor="w", padx=20)
+
+    # --- Selección de materia ---
+    tk.Label(param_frame, text="Seleccionar Materia", font=("Helvetica", 11, "bold"), bg="white").pack(anchor="w", pady=(10,5))
+    combo_materias = ttk.Combobox(
+        param_frame,
+        values=["Selecciona una materia"] + materias_lista,
+        state="readonly",
+        font=("Helvetica", 12),
+        width=30  # Más ancho
+    )
+    combo_materias.set("Selecciona una materia")
+    combo_materias.pack(pady=5)
+
     def actualizar_info_materia(materia):
         G = getMalla()
         info = obtener_info_materia(G, materia)
         for campo in campos:
             valor = info.get(campo, "No registrado")
             labels_info[campo].config(text=valor)
-
-    
-    # Tipo de algoritmo
-    tk.Label(right_panel, text="TIPO DE ALGORITMO:", font=("Helvetica", 14, "bold"),
-             bg="#7b002c", fg="white", width=30).pack(pady=15)
-    algoritmo_var = tk.StringVar(value="DFS")
-    tk.Radiobutton(right_panel, text="BFS", variable=algoritmo_var, value="BFS", bg="white", font=("Helvetica", 12)).pack(anchor="w", padx=40)
-    tk.Radiobutton(right_panel, text="DFS", variable=algoritmo_var, value="DFS", bg="white", font=("Helvetica", 12)).pack(anchor="w", padx=40)
-
-    # Recorrer por
-    tk.Label(right_panel, text="RECORRER POR:", font=("Helvetica", 14, "bold"),
-             bg="#7b002c", fg="white", width=30).pack(pady=15)
-    recorrido_var = tk.StringVar(value="Pre-requisitos")
-    tk.Radiobutton(right_panel, text="Pre-requisitos", variable=recorrido_var, value="Pre-requisitos", bg="white", font=("Helvetica", 12)).pack(anchor="w", padx=40)
-    tk.Radiobutton(right_panel, text="Post-requisitos", variable=recorrido_var, value="Post-requisitos", bg="white", font=("Helvetica", 12)).pack(anchor="w", padx=40)
-
-    # Seleccionar materia
-    tk.Label(right_panel, text="SELECCIONAR MATERIA:", font=("Helvetica", 14, "bold"),
-             bg="#7b002c", fg="white", width=30).pack(pady=15)
-    combo_materias = ttk.Combobox(right_panel, values=["Selecciona una materia"] + materias_lista, state="readonly", font=("Helvetica", 13), width=28)
-    combo_materias.set("Selecciona una materia")
-    combo_materias.pack(pady=10)
 
     def enviar_accion():
         materia = combo_materias.get()
@@ -233,18 +269,6 @@ def abrirVentanaPerfil(usuarioInfo, ventana_login):
             malla_canvas.delete("all")
             malla_canvas.create_text(20, 20, anchor="nw", text=f"No se pudo generar imagen para:\n{materia}", fill="black")
 
-    enviar_btn = tk.Button(right_panel, text="Enviar", font=("Helvetica", 13, "bold"),
-                           bg="#7b002c", fg="white", width=18, height=2, command=enviar_accion)
-    enviar_btn.pack(pady=10)
-
-    descargar_btn = tk.Button(right_panel, text="Descargar Benchmark", font=("Helvetica", 13, "bold"),
-                              bg="#7b002c", fg="white", width=18, height=2, command=lambda: download_benchmark(combo_materias.get(), recorrido_var.get())) 
-    descargar_btn.pack(pady=10)
-
-    planificador_btn = tk.Button(right_panel, text="Ver Planificador", font=("Helvetica", 13, "bold"),
-              bg="#7b002c", fg="white", width=18, height=2, command=abrir_ventana_planificador)
-    planificador_btn.pack(pady=10)
-
     def download_benchmark(materia, recorrido):
         materias = []
         tiempos = []
@@ -275,6 +299,17 @@ def abrirVentanaPerfil(usuarioInfo, ventana_login):
         nombre_archivo = os.path.join("data", f"benchmark_{materia.replace(' ', '_')}.xlsx")
         
         guardar_resultados_csv(nombre_archivo, materias, tiempos, criterio, algoritmo, mpm)
+        
+    enviar_btn = tk.Button(btn_frame, text="Enviar", **btn_style, command=enviar_accion)
+    enviar_btn.pack(fill="x", pady=5)
+
+    descargar_btn = tk.Button(btn_frame, text="Descargar Benchmark", **btn_style,
+                            command=lambda: download_benchmark(combo_materias.get(), recorrido_var.get()))
+    descargar_btn.pack(fill="x", pady=5)
+
+    planificador_btn = tk.Button(btn_frame, text="Ver Planificador", **btn_style,
+                                command=abrir_ventana_planificador)
+    planificador_btn.pack(fill="x", pady=5)
 
     def guardar_resultados_csv(nombre_archivo, materias, tiempos, criterio, algoritmo, mpm):
 
