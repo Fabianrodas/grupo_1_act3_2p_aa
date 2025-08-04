@@ -6,8 +6,8 @@ from tkinter import ttk
 from PIL import Image, ImageTk
 from src.utils.consts import *
 from src.utils.malla import getMalla, dibujarMalla, dibujarPrerequisitos
-from src.logic.dfs import DFS_prerequisitos
-from src.logic.bfs import BFS_prerequisitos
+from src.logic.dfs import DFS_prerequisitos, DFS_postrequisitos
+from src.logic.bfs import BFS_prerequisitos, BFS_postrequisitos
 
 def normaliza_nombre(nombre):
     t = str.maketrans("áéíóúñÁÉÍÓÚ", "aeiounAEIOU")
@@ -16,6 +16,10 @@ def normaliza_nombre(nombre):
 def obtener_imagen_prerequisitos(materia):
     nombre_img = normaliza_nombre(materia)
     return Path(f"prerequisitos_{nombre_img}.png")
+
+def obtener_imagen_postrequisitos(materia):
+    nombre_img = normaliza_nombre(materia)
+    return Path(f"postrequisitos_{nombre_img}.png")
 
 def abrirVentanaPerfil(usuarioInfo, ventana_login):
     perfil_ventana = tk.Toplevel()
@@ -146,18 +150,18 @@ def abrirVentanaPerfil(usuarioInfo, ventana_login):
 
         algoritmo = algoritmo_var.get()
         recorrido = recorrido_var.get()
+        
+        G = getMalla()
 
         if recorrido == "Post-requisitos":
-            malla_canvas.delete("all")
-            malla_canvas.create_text(20, 20, anchor="nw", text="Aún no está implementada.", fill="black")
-            return
+            resultado = BFS_postrequisitos(G, materia) if algoritmo == "BFS" else DFS_postrequisitos(G, materia)
+            ruta_img = obtener_imagen_postrequisitos(materia)
+            ok = dibujarPrerequisitos(G, materia, list(resultado), True)
+        else:
+            resultado = BFS_prerequisitos(G, materia) if algoritmo == "BFS" else DFS_prerequisitos(G, materia)
+            ruta_img = obtener_imagen_prerequisitos(materia)
+            ok = dibujarPrerequisitos(G, materia, list(resultado))
 
-        G = getMalla()
-        prereqs = BFS_prerequisitos(G, materia) if algoritmo == "BFS" else DFS_prerequisitos(G, materia)
-        prereqs = list(prereqs)
-
-        ruta_img = obtener_imagen_prerequisitos(materia)
-        ok = dibujarPrerequisitos(G, materia, prereqs)
         if ok and ruta_img.exists():
             cargar_y_mostrar_imagen(str(ruta_img))
         else:
@@ -181,19 +185,28 @@ def abrirVentanaPerfil(usuarioInfo, ventana_login):
     malla_img = None
     scale_factor = 0.6
 
+    # Variables de control
+    scale_factor = 0.6
+    malla_img = None
+    image_id = None
+    drag_data = {"x": 0, "y": 0}
+
     def cargar_y_mostrar_imagen(path, reset_zoom=True):
-        nonlocal malla_img, scale_factor
+        nonlocal malla_img, scale_factor, image_id
         try:
             img = Image.open(path)
             if reset_zoom:
                 scale_factor = 0.6
+
             w, h = int(img.width * scale_factor), int(img.height * scale_factor)
             img = img.resize((w, h), Image.LANCZOS)
-            
+
             malla_img = ImageTk.PhotoImage(img)
             malla_canvas.delete("all")
-            malla_canvas.imgtk = malla_img  
-            malla_canvas.create_image(0, 0, anchor="nw", image=malla_img)
+            malla_canvas.imgtk = malla_img
+
+            # Crear imagen centrada en (0,0)
+            image_id = malla_canvas.create_image(0, 0, anchor="nw", image=malla_img)
             malla_canvas.config(scrollregion=malla_canvas.bbox("all"))
             malla_canvas.current_image_path = path
         except:
@@ -205,16 +218,77 @@ def abrirVentanaPerfil(usuarioInfo, ventana_login):
 
     mostrar_malla_general()
 
+    # --------------------
+    # Zoom centrado en el cursor
+    # --------------------
     def zoom(event):
-        nonlocal scale_factor
+        nonlocal scale_factor, malla_img, image_id
+
         if malla_img is None:
             return
-        if event.delta > 0 or event.num == 4:
-            scale_factor *= 1.1
-        elif event.delta < 0 or event.num == 5:
-            scale_factor /= 1.1
-        scale_factor = max(0.2, min(scale_factor, 3.0))
-        cargar_y_mostrar_imagen(malla_canvas.current_image_path, reset_zoom=False)
+
+        factor = 1.1 if (event.delta > 0 or event.num == 4) else 0.9
+        new_scale = scale_factor * factor
+        new_scale = max(0.2, min(new_scale, 3.0))
+
+        # Posición del cursor sobre el canvas
+        mouse_x = malla_canvas.canvasx(event.x)
+        mouse_y = malla_canvas.canvasy(event.y)
+
+        # Tamaño actual
+        old_w, old_h = malla_img.width(), malla_img.height()
+
+        # Relativo dentro de la imagen
+        rel_x = (mouse_x - malla_canvas.coords(image_id)[0]) / old_w
+        rel_y = (mouse_y - malla_canvas.coords(image_id)[1]) / old_h
+
+        # Actualizar escala
+        scale_factor = new_scale
+
+        # Redibujar imagen escalada
+        img = Image.open(malla_canvas.current_image_path)
+        w, h = int(img.width * scale_factor), int(img.height * scale_factor)
+        img = img.resize((w, h), Image.LANCZOS)
+        malla_img = ImageTk.PhotoImage(img)
+
+        malla_canvas.delete(image_id)
+        image_id = malla_canvas.create_image(0, 0, anchor="nw", image=malla_img)
+
+        # Nueva posición para que el punto del cursor quede igual
+        new_x = mouse_x - rel_x * w
+        new_y = mouse_y - rel_y * h
+        malla_canvas.coords(image_id, new_x, new_y)
+
+        malla_canvas.config(scrollregion=malla_canvas.bbox("all"))
+
+    malla_canvas.bind("<MouseWheel>", zoom)
+    malla_canvas.bind("<Button-4>", zoom)
+    malla_canvas.bind("<Button-5>", zoom)
+
+    # --------------------
+    # Pan / Arrastrar imagen con clic izquierdo
+    # --------------------
+    def start_drag(event):
+        drag_data["x"] = event.x
+        drag_data["y"] = event.y
+
+    def do_drag(event):
+        # Diferencia de movimiento
+        dx = event.x - drag_data["x"]
+        dy = event.y - drag_data["y"]
+
+        # Mover la imagen
+        malla_canvas.move(image_id, dx, dy)
+
+        # Actualizar punto de inicio
+        drag_data["x"] = event.x
+        drag_data["y"] = event.y
+
+        malla_canvas.config(scrollregion=malla_canvas.bbox("all"))
+
+    malla_canvas.bind("<ButtonPress-1>", start_drag)
+    malla_canvas.bind("<B1-Motion>", do_drag)
+
 
     malla_canvas.bind("<MouseWheel>", zoom)
     malla_canvas.bind("<Button-4>", zoom)  

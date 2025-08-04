@@ -140,14 +140,17 @@ def dibujarMalla(G, filename="malla.png"):
         print(f"Error generando malla: {e}")
         return False
 
-def dibujarPrerequisitos(G, materia_principal, materias_resaltadas=None, filename=None):
+def dibujarPrerequisitos(G, materia_principal, materias_resaltadas=None, postrequisitos=False, filename=None):
     if not materia_principal or materia_principal not in G.nodes:
         print(f"No se pudo generar imagen para: {materia_principal}")
         return False
 
     nombre_img = normaliza_nombre(materia_principal)
     if filename is None:
-        filename = f"prerequisitos_{nombre_img}.png"
+        if postrequisitos:
+            filename = f"postrequisitos_{nombre_img}.png"
+        else:
+            filename = f"prerequisitos_{nombre_img}.png"
 
     # Crear figura fija 1300x800 px
     fig, ax = plt.subplots(figsize=(13, 8), dpi=100)
