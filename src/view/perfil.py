@@ -117,6 +117,31 @@ def abrirVentanaPerfil(usuarioInfo, ventana_login):
     h_scroll.pack(side="bottom", fill="x")
     v_scroll.pack(side="right", fill="y")
 
+    # Inicalizar malla
+    G = getMalla()
+    malla_path = Path("malla.png")
+    if not malla_path.exists():
+        dibujarMalla(G)
+
+    # Frame para el botón de reset zoom, colocado justo debajo del frame_malla
+    frame_reset = tk.Frame(frame, bg="white")
+    frame_reset.place(relx=0.03, rely=0.95)  # Ajusta 'rely' para que quede debajo de frame_malla
+
+    # Botón para resetear el zoom de la imagen de la malla (última imagen mostrada)
+    malla_path = Path("malla.png")
+    ultima_ruta_img = [str(malla_path)]  # Variable mutable para almacenar la última imagen cargada
+
+    reset_zoom_btn = tk.Button(
+        frame_reset,
+        text="Resetear Zoom",
+        font=("Helvetica", 11, "bold"),
+        bg="#801434",
+        fg="white",
+        command=lambda: cargar_y_mostrar_imagen(ultima_ruta_img[0], reset_zoom=True)
+    )
+    reset_zoom_btn.pack()
+
+    # Panel derecho
     right_panel = tk.Frame(frame, bg="white", width=350, height=500)
     right_panel.pack(side="right", padx=250, pady=(0,220)) 
     right_panel.pack_propagate(False)
@@ -177,13 +202,10 @@ def abrirVentanaPerfil(usuarioInfo, ventana_login):
     descargar_btn.pack(pady=10)
 
     # Funciones de la malla
-    G = getMalla()
-    malla_path = Path("malla.png")
-    if not malla_path.exists():
-        dibujarMalla(G)
-
-    malla_img = None
-    scale_factor = 0.6
+    # G = getMalla()
+    # malla_path = Path("malla.png")
+    # if not malla_path.exists():
+    #     dibujarMalla(G)
 
     # Variables de control
     scale_factor = 0.6
@@ -191,8 +213,10 @@ def abrirVentanaPerfil(usuarioInfo, ventana_login):
     image_id = None
     drag_data = {"x": 0, "y": 0}
 
+    # Funciones de malla
     def cargar_y_mostrar_imagen(path, reset_zoom=True):
         nonlocal malla_img, scale_factor, image_id
+        ultima_ruta_img[0] = path
         try:
             img = Image.open(path)
             if reset_zoom:
