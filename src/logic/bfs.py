@@ -24,4 +24,25 @@ def BFS_prerequisitos(grafo, materia, visitados=None):
     return resultado
     
 
+def BFS_postrequisitos_interno(grafo, materia, visitados=None):
+    if visitados is None:
+        visitados = set()
     
+    cola = deque()
+    cola.append(materia)
+    visitados.add(materia)
+
+    while cola:
+        actual = cola.popleft()
+        for postrequisito in grafo.successors(actual):
+            if postrequisito not in visitados:
+                print(f"Visitando materia: {postrequisito}")
+                visitados.add(postrequisito)
+                cola.append(postrequisito)
+
+    return visitados
+
+def BFS_postrequisitos(grafo, materia):
+    resultado = BFS_postrequisitos_interno(grafo, materia)
+    resultado.remove(materia)  # removemos la materia de inicio
+    return resultado
