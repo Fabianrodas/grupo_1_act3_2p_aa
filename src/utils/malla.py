@@ -2,10 +2,8 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from src.utils.consts import *
-from pathlib import Path
 import unicodedata
 from matplotlib.patches import FancyArrowPatch
-from matplotlib.patches import PathPatch
 from matplotlib.path import Path as Path2
 import textwrap
 import numpy as np

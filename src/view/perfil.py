@@ -2,7 +2,7 @@ import sys
 from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parents[2]))
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox
 from PIL import Image, ImageTk
 from src.utils.consts import *
 from src.utils.malla import getMalla, dibujarMalla, dibujarPrerequisitos, obtener_info_materia
@@ -273,7 +273,8 @@ def abrirVentanaPerfil(usuarioInfo, ventana_login):
         materias = []
         tiempos = []
         
-        if not materia:
+        if not materia or materia == "Selecciona una materia":
+            messagebox.showerror("Error", "Por favor, selecciona una materia")
             return
         algoritmo = algoritmo_var.get()
         
@@ -289,15 +290,19 @@ def abrirVentanaPerfil(usuarioInfo, ventana_login):
                 materias.append([])
             
             mpm = tuple(mpm_list)
+
+            os.makedirs("data", exist_ok=True)
+            nombre_archivo = os.path.join("data", f"benchmark_{materia.replace(' ', '_')}_{criterio}_{datetime.now().strftime('%Y%m%d%H%M%S')}.xlsx")
+        
+            guardar_resultados_csv(nombre_archivo, materias, tiempos, criterio, algoritmo, mpm)
+
+            # Alerta de éxito
+            messagebox.showinfo("Benchmark descargado", f"Archivo guardado en:\n{nombre_archivo}")
             
         except Exception as e:
             print(f"Error in benchmark: {e}")
-            mpm = ("0.00000 s", "0.00000 s", "0.00000 s")
-        
-        os.makedirs("data", exist_ok=True)
-        nombre_archivo = os.path.join("data", f"benchmark_{materia.replace(' ', '_')}_{criterio}_{datetime.now().strftime('%Y%m%d%H%M%S')}.xlsx")
-        
-        guardar_resultados_csv(nombre_archivo, materias, tiempos, criterio, algoritmo, mpm)
+            messagebox.showerror("Error", f"Ocurrió un error al generar el benchmark:\n{e}")
+
         
     enviar_btn = tk.Button(btn_frame, text="Enviar", **btn_style, command=enviar_accion)
     enviar_btn.pack(fill="x", pady=5)
