@@ -10,7 +10,7 @@ from src.logic.dfs import DFS_prerequisitos, DFS_postrequisitos
 from src.logic.bfs import BFS_prerequisitos, BFS_postrequisitos
 from src.view.planificador import abrir_ventana_planificador
 from src.model.benchmark import sortResults
-import timeit
+from datetime import datetime
 import pandas as pd
 import psutil
 import winreg
@@ -275,7 +275,6 @@ def abrirVentanaPerfil(usuarioInfo, ventana_login):
         
         if not materia:
             return
-            
         algoritmo = algoritmo_var.get()
         
         criterio = "prerequisitos" if recorrido == "Pre-requisitos" else "postrequisitos"
@@ -296,7 +295,7 @@ def abrirVentanaPerfil(usuarioInfo, ventana_login):
             mpm = ("0.00000 s", "0.00000 s", "0.00000 s")
         
         os.makedirs("data", exist_ok=True)
-        nombre_archivo = os.path.join("data", f"benchmark_{materia.replace(' ', '_')}.xlsx")
+        nombre_archivo = os.path.join("data", f"benchmark_{materia.replace(' ', '_')}_{criterio}_{datetime.now().strftime('%Y%m%d%H%M%S')}.xlsx")
         
         guardar_resultados_csv(nombre_archivo, materias, tiempos, criterio, algoritmo, mpm)
         
