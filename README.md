@@ -46,4 +46,4 @@ Este proyecto fue realizado gracias a la contribución de las siguientes persona
 - Dylan Drouet
 - Fabian Rodas
 - Luis Goncalves 
-- Andrea Torres
+- Paula Benalcázar
