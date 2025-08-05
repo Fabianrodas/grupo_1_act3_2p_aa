@@ -268,7 +268,7 @@ def abrirVentanaPerfil(usuarioInfo, ventana_login):
         else:
             malla_canvas.delete("all")
             malla_canvas.create_text(20, 20, anchor="nw", text=f"No se pudo generar imagen para:\n{materia}", fill="black")
-
+    num_reps = 1000
     def download_benchmark(materia, recorrido):
         materias = []
         tiempos = []
@@ -281,7 +281,7 @@ def abrirVentanaPerfil(usuarioInfo, ventana_login):
         criterio = "prerequisitos" if recorrido == "Pre-requisitos" else "postrequisitos"
         
         try:
-            tiempo_list, mpm_list = sortResults(algoritmo, G, materia, criterio, 1000, 1)
+            tiempo_list, mpm_list = sortResults(algoritmo, G, materia, criterio, num_reps, 1)
             
             for tiempo_str in tiempo_list:
                 tiempo = float(tiempo_str.replace("s", "").strip())
@@ -292,7 +292,7 @@ def abrirVentanaPerfil(usuarioInfo, ventana_login):
             mpm = tuple(mpm_list)
 
             os.makedirs("data", exist_ok=True)
-            nombre_archivo = os.path.join("data", f"benchmark_{materia.replace(' ', '_')}_{criterio}_{datetime.now().strftime('%Y%m%d%H%M%S')}.xlsx")
+            nombre_archivo = os.path.join("data", f"benchmark_{materia.replace(' ', '_')}_{criterio}_{num_reps}_{algoritmo}_{datetime.now().strftime('%Y%m%d%H%M%S')}.xlsx")
         
             guardar_resultados_csv(nombre_archivo, materias, tiempos, criterio, algoritmo, mpm)
 
